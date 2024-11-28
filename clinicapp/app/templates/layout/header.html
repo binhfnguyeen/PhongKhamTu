@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">CliniApp</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/datlichkham">Đặt Lịch khám</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/lapphieukham">Lập phiếu Khám</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/thanhtoan">Thanh toán</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
+                </li>
+            </ul>
+            <!--        phần đăng nhập ở đây-->
+            <ul class="navbar-nav ms-auto">
+                {% if user_name %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Xin chào, {{ user_name }}</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Đăng nhập</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
