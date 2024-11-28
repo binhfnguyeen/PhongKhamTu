@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">CliniApp</a>
+        <a class="navbar-brand" href="/">ClinicApp</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -19,18 +19,16 @@
                     <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
                 </li>
             </ul>
-            <!--        phần đăng nhập ở đây-->
-            <ul class="navbar-nav ms-auto">
-                {% if user_name %}
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Xin chào, {{ user_name }}</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Đăng nhập</a>
-                </li>
-                {% endif %}
-            </ul>
+            <!-- Đăng nhập - Đăng ký -->
+            <div class="dropdown navbar-nav ms-auto">
+                <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                    Chưa đăng nhập
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a class="dropdown-item" id="login" href="/login">Đăng nhập</a></li>
+                    <li><a class="dropdown-item" id="signup" href="/signup">Đăng ký</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>

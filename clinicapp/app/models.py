@@ -12,6 +12,8 @@ class NguoiDung(db.Model):
     cccd = Column(String(12), unique=True)
     diaChi = Column(String(100))
     sdt = Column(String(10), unique=True)
+    avatar = Column(String(100),
+                    default='https://res.cloudinary.com/dwivkhh8t/image/upload/v1732798321/male_fqyusr.png')
 
 class BenhNhan(NguoiDung):
     idBenhNhan = Column(Integer, primary_key=True, autoincrement=True)
