@@ -1,6 +1,10 @@
+from datetime import date
+
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE
-from sqlalchemy.orm import relationship
+# from sqlalchemy.orm import relationship
 from clinicapp.app import app, db
+from flask_login import UserMixin
+
 
 class NguoiDung(db.Model):
     __abstract__ = True
@@ -15,14 +19,21 @@ class NguoiDung(db.Model):
     avatar = Column(String(100),
                     default='https://res.cloudinary.com/dwivkhh8t/image/upload/v1732798321/male_fqyusr.png')
 
-class BenhNhan(NguoiDung):
+
+class BenhNhan(NguoiDung, UserMixin):
     idBenhNhan = Column(Integer, primary_key=True, autoincrement=True)
 
+    def get_id(self):
+        return (self.idBenhNhan)
 
-class NhanVien(NguoiDung):
+
+class NhanVien(NguoiDung, UserMixin):
     idNhanVien = Column(Integer, primary_key=True, autoincrement=True)
     bangCap = Column(String(50))
     ngayVaoLam = Column(DATE)
+
+    def get_id(self):
+        return (self.idNhanVien)
 
 
 class YTa(NhanVien):
@@ -57,10 +68,12 @@ class LichKham(db.Model):
     id_benhnhan = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
     id_yta = Column(Integer, ForeignKey(YTa.idYTa), nullable=False)
 
+
 class Thuoc(db.Model):
     idThuoc = Column(Integer, primary_key=True, autoincrement=True)
     tenThuoc = Column(String(50))
     huongDanSuDung = Column(String(100))
+
 
 class HoaDon(db.Model):
     idHoaDon = Column(Integer, primary_key=True, autoincrement=True)
@@ -85,6 +98,7 @@ class ChiTietDonThuoc(db.Model):
     id_thuoc = Column(Integer, ForeignKey(Thuoc.idThuoc), primary_key=True)
     soLuongThuoc = Column(Integer)
 
+
 class DonViThuoc(db.Model):
     idDonViThuoc = Column(Integer, primary_key=True, autoincrement=True)
     donVi = Column(String(50))
@@ -104,7 +118,22 @@ class DanhMucThuoc(db.Model):
     hamLuong = Column(Float)
 
 
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+
+        import hashlib
+        benh_nhan = BenhNhan(
+            hoTen="Nguyễn Văn A",
+            username="nguyenvana",
+            password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),  # Mật khẩu phải được mã hóa trong thực tế, ví dụ sử dụng bcrypt
+            gioiTinh=True,  # True cho nam, False cho nữ
+            ngaySinh=date(1990, 1, 1),
+            cccd="123456789012",
+            diaChi="Hà Nội",
+            sdt="0123456789",
+        )
+
+        # Thêm vào cơ sở dữ liệu và commit
+        db.session.add(benh_nhan)
+        db.session.commit()

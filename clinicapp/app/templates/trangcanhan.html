@@ -1,0 +1,67 @@
+{% extends "layout/base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/trangcanhan.css') }}">
+{% endblock %}
+
+{% block content %}
+<form method="post" action="/luuthongtin" enctype="multipart/form-data" class="container rounded bg-white mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3 border-right">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                <img class="rounded-circle mt-5" width="150px" src="{{ user_info.avatar }}">
+                <span class="font-weight-bold" >@{{ user_info.username }}</span>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-right">Thông tin cá nhân</h4>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="labels">Họ và Tên</label>
+                        <input type="text" class="form-control" name="name" placeholder="Nhập họ và tên"
+                        value="{{ user_info.hoTen if user_info.hoTen else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="labels">Giới tính</label>
+                        <select class="form-control" name="gioitinh">
+                            <option value="">Chọn giới tính</option>
+                            <option value="1" {% if user_info.gioiTinh == 1 %}selected{% endif %} >Nam</option>
+                            <option value="0" {% if user_info.gioiTinh == 0 %}selected{% endif %} >Nữ</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="labels">Ngày Sinh</label>
+                        <input type="date" class="form-control" name="ngaysinh" placeholder="Chọn ngày sinh"
+                               value="{{ user_info.ngaySinh if user_info.ngaySinh else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="labels">Căn cước công dân</label>
+                        <input type="text" class="form-control" name="cccd" placeholder="Nhập số CCCD"
+                               value="{{ user_info.cccd if user_info.cccd else '' }}">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label class="labels">Địa chỉ</label>
+                        <input type="text" class="form-control" name="diachi" placeholder="Nhập địa chỉ"
+                                value="{{ user_info.diaChi if user_info.diaChi else '' }}">
+                    </div>
+                    <div class="col-md-12 mt-3">
+                        <label class="labels">Số điện thoại</label>
+                        <input type="text" class="form-control" name="sdt" placeholder="Nhập số điện thoại"
+                               value="{{ user_info.sdt if user_info.sdt else '' }}">
+                    </div>
+                </div>
+                <div class="mt-5 text-center">
+                    <button class="btn btn-primary profile-button" type="submit">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

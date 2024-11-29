@@ -20,15 +20,28 @@
                 </li>
             </ul>
             <!-- Đăng nhập - Đăng ký -->
+            {% if current_user.is_authenticated %}
+            <div class="dropdown navbar-nav ms-auto">
+                <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                    <img src="{{ current_user.avatar }}" width="25" class="rounded-circle">
+                    Chào {{ current_user.username }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a class="dropdown-item" id="TrangCaNhan" href="/trangcanhan">Trang cá nhân</a></li>
+                    <li><a class="dropdown-item" id="logout" href="/logout">Đăng xuất</a></li>
+                </ul>
+            </div>
+            {% else %}
             <div class="dropdown navbar-nav ms-auto">
                 <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
                     Chưa đăng nhập
                 </button>
                 <ul class="dropdown-menu dropdown-menu-dark">
                     <li><a class="dropdown-item" id="login" href="/login">Đăng nhập</a></li>
-                    <li><a class="dropdown-item" id="signup" href="/signup">Đăng ký</a></li>
+                    <li><a class="dropdown-item" id="signup" href="/register">Đăng ký</a></li>
                 </ul>
             </div>
+            {% endif %}
         </div>
     </div>
 </nav>

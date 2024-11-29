@@ -1,7 +1,23 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-<section class="vh-100 gradient-custom">
+
+{% if err_msg %}
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          {{ err_msg }}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<form method="post" action="/register" enctype="multipart/form-data" class="vh-100 gradient-custom">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-6 col-lg-5 col-xl-4">
@@ -15,23 +31,23 @@
 
               <div data-mdb-input-init class="form-outline form-white mb-3">
                 <label class="form-label" for="name">Họ và tên</label>
-                <input type="text" id="name" class="form-control form-control-lg" style="font-size: 0.9rem;" />
+                <input type="text" id="name" name="name" class="form-control form-control-lg" style="font-size: 0.9rem;" />
               </div>
 
               <div data-mdb-input-init class="form-outline form-white mb-3">
                 <label class="form-label" for="username">Tài khoản</label>
-                <input type="text" id="username" class="form-control form-control-lg" style="font-size: 0.9rem;" />
+                <input type="text" id="username" name="username" class="form-control form-control-lg" style="font-size: 0.9rem;" />
               </div>
 
               <div data-mdb-input-init class="form-outline form-white mb-3">
                 <label class="form-label" for="password">Mật khẩu</label>
-                <input type="password" id="password" class="form-control form-control-lg" style="font-size: 0.9rem;" />
+                <input type="password" id="password" name="password" class="form-control form-control-lg" style="font-size: 0.9rem;" />
               </div>
 
 
               <div data-mdb-input-init class="form-outline form-white mb-3">
                 <label class="form-label" for="confirm">Xác nhận mật khẩu</label>
-                <input type="password" id="confirm" class="form-control form-control-lg" style="font-size: 0.9rem;" />
+                <input type="password" id="confirm" name="confirm" class="form-control form-control-lg" style="font-size: 0.9rem;" />
               </div>
 
               <div data-mdb-input-init class="form-outline form-white mb-3">
@@ -39,7 +55,7 @@
                 <input type="file" class="form-control form-control-lg" id="avatar" style="font-size: 0.9rem;" name="avatar"/>
               </div>
 
-              <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-sm px-4" type="submit">Đăng ký</button>
+              <button class="btn btn-outline-light btn-sm px-4" type="submit">Đăng ký</button>
 
             </div>
 
@@ -53,5 +69,9 @@
       </div>
     </div>
   </div>
-</section>
+</form>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/style.js') }}"></script>
 {% endblock %}
