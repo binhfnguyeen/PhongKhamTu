@@ -88,7 +88,7 @@ def update_profile():
                 diaChi=diachi.strip(),
                 sdt=sdt.strip()
             )
-            
+
             return redirect('/trangcanhan')
 
     return render_template("login.html")
