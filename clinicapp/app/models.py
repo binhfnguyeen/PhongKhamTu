@@ -123,17 +123,83 @@ if __name__ == '__main__':
         db.create_all()
 
         import hashlib
-        benh_nhan = BenhNhan(
-            hoTen="Nguyễn Văn A",
-            username="nguyenvana",
-            password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),  # Mật khẩu phải được mã hóa trong thực tế, ví dụ sử dụng bcrypt
-            gioiTinh=True,  # True cho nam, False cho nữ
-            ngaySinh=date(1990, 1, 1),
-            cccd="123456789012",
-            diaChi="Hà Nội",
-            sdt="0123456789",
-        )
+        # benh_nhan = BenhNhan(
+        #     hoTen="Nguyễn Văn A",
+        #     username="nguyenvana",
+        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #     gioiTinh=True,  # True cho nam, False cho nữ
+        #     ngaySinh=date(1990, 1, 1),
+        #     cccd="123456789012",
+        #     diaChi="Hà Nội",
+        #     sdt="0123456789",
+        # )
+        #
+        # # Thêm vào cơ sở dữ liệu và commit
+        # db.session.add(benh_nhan)
+        # db.session.commit()
 
-        # Thêm vào cơ sở dữ liệu và commit
-        db.session.add(benh_nhan)
-        db.session.commit()
+        # yta = YTa(
+        #     bangCap="Trung cấp Y tế",
+        #     ngayVaoLam="2020-03-01",
+        #     hoTen="Nguyen Thi B",
+        #     username="yta_b",
+        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #     gioiTinh=False,
+        #     ngaySinh="1995-05-12",
+        #     cccd="123456789012",
+        #     diaChi="123 Đường ABC, Quận 1",
+        #     sdt="0987654321",
+        # )
+        #
+        # db.session.add(yta)
+        # db.session.commit()
+
+        # bac_si = BacSi(
+        #     ngayVaoLam="2015-06-01",
+        #     bangCap="Bác sĩ chuyên khoa I",
+        #     hoTen="Nguyen Van A",
+        #     username="bacsi_a",
+        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #     gioiTinh=True,
+        #     ngaySinh="1985-01-15",
+        #     cccd="123456788011",
+        #     diaChi="456 Đường XYZ, Quận 2",
+        #     sdt="0912345678",
+        #     chuyenKhoa="Nội tiết",
+        # )
+        #
+        # db.session.add(bac_si)
+        # db.session.commit()
+
+        # thu_ngan = ThuNgan(
+        #     ngayVaoLam="2021-06-01",
+        #     bangCap="Cử Nhân",
+        #     hoTen="Nguyen Tuyet B",
+        #     username="thungan_a",
+        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #     gioiTinh=False,
+        #     ngaySinh="2001-01-15",
+        #     cccd="100056788011",
+        #     diaChi="456 Đường XYZ, Quận 10",
+        #     sdt="0912333668",
+        # )
+        #
+        # db.session.add(thu_ngan)
+        # db.session.commit()
+
+        # quan_tri = QuanTri(
+        #     ngayVaoLam="2019-11-01",
+        #     bangCap="Cử Nhân",
+        #     hoTen="Nguyen Duc A",
+        #     username="quantri_a",
+        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #     gioiTinh=True,
+        #     ngaySinh="1999-11-16",
+        #     cccd="100056778911",
+        #     diaChi="Nguyễn Văn Linh, Quận 7",
+        #     sdt="0992443668",
+        #     phongBan="PB_IT"
+        # )
+        #
+        # db.session.add(quan_tri)
+        # db.session.commit()

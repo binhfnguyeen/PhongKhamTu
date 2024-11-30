@@ -1,4 +1,6 @@
-from flask import render_template, request, redirect, flash
+from flask import render_template, request, redirect
+from sqlalchemy.sql.functions import current_user
+
 from clinicapp.app import app, login
 import dao
 from flask_login import login_user, logout_user, current_user
@@ -51,7 +53,25 @@ def signup_process():
 @app.route('/trangcanhan')
 def user_profile():
     if current_user.is_authenticated:
-        user_info = dao.get_id_user(current_user.idBenhNhan)
+        user_info = None
+
+        if hasattr(current_user, 'idBenhNhan') and current_user.idBenhNhan:
+            user = dao.get_id_user(current_user.idBenhNhan)
+            if user:
+                user_info = user
+        elif hasattr(current_user, 'idYTa') and current_user.idYTa:
+            yta = dao.get_id_yta(current_user.idYTa)
+            if yta:
+                user_info = yta
+        elif hasattr(current_user, 'idBacSi') and current_user.idBacSi:
+            bacsi = dao.get_id_bacsi(current_user.idBacSi)
+            if bacsi:
+                user_info = bacsi
+        elif hasattr(current_user, 'idThuNgan') and current_user.idThuNgan:
+            thungan = dao.get_id_thungan(current_user.idThuNgan)
+            if thungan:
+                user_info = thungan
+
         return render_template('trangcanhan.html', user_info=user_info)
     return render_template('login.html')
 
@@ -79,15 +99,46 @@ def update_profile():
             else:
                 ngaysinh = None
 
-            dao.update_profile(
-                user_id=current_user.idBenhNhan,
-                name=name.strip(),
-                gioiTinh=gioitinh,
-                ngaySinh=ngaysinh,
-                cccd=cccd.strip(),
-                diaChi=diachi.strip(),
-                sdt=sdt.strip()
-            )
+            if hasattr(current_user, 'idBenhNhan') and current_user.idBenhNhan:
+                dao.update_profile(
+                    user_id=current_user.idBenhNhan,
+                    name=name.strip(),
+                    gioiTinh=gioitinh,
+                    ngaySinh=ngaysinh,
+                    cccd=cccd.strip(),
+                    diaChi=diachi.strip(),
+                    sdt=sdt.strip()
+                )
+            elif hasattr(current_user, 'idYTa') and current_user.idYTa:
+                dao.update_profile(
+                    user_id=current_user.idYTa,
+                    name=name.strip(),
+                    gioiTinh=gioitinh,
+                    ngaySinh=ngaysinh,
+                    cccd=cccd.strip(),
+                    diaChi=diachi.strip(),
+                    sdt=sdt.strip()
+                )
+            elif hasattr(current_user, 'idBacSi') and current_user.idBacSi:
+                dao.update_profile(
+                    user_id=current_user.idBacSi,
+                    name=name.strip(),
+                    gioiTinh=gioitinh,
+                    ngaySinh=ngaysinh,
+                    cccd=cccd.strip(),
+                    diaChi=diachi.strip(),
+                    sdt=sdt.strip()
+                )
+            elif hasattr(current_user, 'idThuNgan') and current_user.idThuNgan:
+                dao.update_profile(
+                    user_id=current_user.idThuNgan,
+                    name=name.strip(),
+                    gioiTinh=gioitinh,
+                    ngaySinh=ngaysinh,
+                    cccd=cccd.strip(),
+                    diaChi=diachi.strip(),
+                    sdt=sdt.strip()
+                )
 
             return redirect('/trangcanhan')
 
@@ -96,8 +147,23 @@ def update_profile():
 
 @login.user_loader
 def get_user_by_id(user_id):
-    return dao.get_id_user(user_id)
+    user = dao.get_id_user(user_id)
+    if user:
+        return user
 
+    yta = dao.get_id_yta(user_id)
+    if yta:
+        return yta
+
+    bacsi = dao.get_id_bacsi(user_id)
+    if bacsi:
+        return bacsi
+
+    thungan = dao.get_id_thungan(user_id)
+    if thungan:
+        return thungan
+
+    return None
 
 @app.route('/datlichkham')
 def datlichkham():
