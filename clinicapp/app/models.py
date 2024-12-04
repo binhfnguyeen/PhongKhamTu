@@ -1,7 +1,8 @@
 from datetime import date
 
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE, Enum
 # from sqlalchemy.orm import relationship
+from enum import Enum as DonViEnum
 from clinicapp.app import app, db
 from flask_login import UserMixin
 
@@ -69,9 +70,16 @@ class LichKham(db.Model):
     id_yta = Column(Integer, ForeignKey(YTa.idYTa), nullable=False)
 
 
+class DonVi(DonViEnum):
+    VIEN = 1
+    CHAI = 2
+    VY = 3
+
+
 class Thuoc(db.Model):
     idThuoc = Column(Integer, primary_key=True, autoincrement=True)
     tenThuoc = Column(String(50))
+    loaiThuoc = Column(Enum(DonVi), default=DonVi.VIEN)
     huongDanSuDung = Column(String(100))
 
 
@@ -99,25 +107,6 @@ class ChiTietDonThuoc(db.Model):
     soLuongThuoc = Column(Integer)
 
 
-class DonViThuoc(db.Model):
-    idDonViThuoc = Column(Integer, primary_key=True, autoincrement=True)
-    donVi = Column(String(50))
-    id_thuoc = Column(Integer, ForeignKey(Thuoc.idThuoc), nullable=False)
-
-
-class LoaiThuoc(db.Model):
-    idLoaiThuoc = Column(Integer, primary_key=True, autoincrement=True)
-    tenLoaiThuoc = Column(String(50))
-
-
-class DanhMucThuoc(db.Model):
-    id_thuoc = Column(Integer, ForeignKey(Thuoc.idThuoc), primary_key=True)
-    id_loaithuoc = Column(Integer, ForeignKey(LoaiThuoc.idLoaiThuoc), primary_key=True)
-    giaThuoc = Column(Float)
-    huongDanSuDung = Column(String(100))
-    hamLuong = Column(Float)
-
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
@@ -137,7 +126,7 @@ if __name__ == '__main__':
         # # Thêm vào cơ sở dữ liệu và commit
         # db.session.add(benh_nhan)
         # db.session.commit()
-
+        #
         # yta = YTa(
         #     bangCap="Trung cấp Y tế",
         #     ngayVaoLam="2020-03-01",
@@ -153,7 +142,7 @@ if __name__ == '__main__':
         #
         # db.session.add(yta)
         # db.session.commit()
-
+        #
         # bac_si = BacSi(
         #     ngayVaoLam="2015-06-01",
         #     bangCap="Bác sĩ chuyên khoa I",
@@ -170,7 +159,7 @@ if __name__ == '__main__':
         #
         # db.session.add(bac_si)
         # db.session.commit()
-
+        #
         # thu_ngan = ThuNgan(
         #     ngayVaoLam="2021-06-01",
         #     bangCap="Cử Nhân",
@@ -186,7 +175,7 @@ if __name__ == '__main__':
         #
         # db.session.add(thu_ngan)
         # db.session.commit()
-
+        #
         # quan_tri = QuanTri(
         #     ngayVaoLam="2019-11-01",
         #     bangCap="Cử Nhân",
