@@ -1,0 +1,104 @@
+[33mcommit 77fcce68f9a56080775ce02f4b5bf6536bd9e2c9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m)[m
+Merge: 58d4b2b ced022c
+Author: “MinhTri07” <minhtri472k4@gmail.com>
+Date:   Thu Dec 5 17:58:10 2024 +0700
+
+    2051224
+
+[33mcommit 58d4b2bdcb3cf9ab88a605a35b19d5d0dfe7b5aa[m
+Author: “MinhTri07” <minhtri472k4@gmail.com>
+Date:   Thu Dec 5 17:54:11 2024 +0700
+
+    luu061224
+
+[33mcommit ced022c3cefda26983da4b439bbf734489ad7329[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Wed Dec 4 19:08:23 2024 +0700
+
+    update
+
+[33mcommit 5c57a1db0b52174e7624322840e2f56a102ef5b2[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Wed Dec 4 18:53:40 2024 +0700
+
+    update models
+
+[33mcommit a13c0d689577f358fd428bdde492164174921002[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Sat Nov 30 14:55:30 2024 +0700
+
+    Login as Y ta, Bac si, Thu ngan
+
+[33mcommit a24dbd38b83e44245c249d70723ec35be389f705[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Fri Nov 29 23:09:03 2024 +0700
+
+    update requirements.txt
+
+[33mcommit 11aec938033017e4260c72bd754824ae23f00565[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Fri Nov 29 23:06:47 2024 +0700
+
+    Add login, signup, user profile
+
+[33mcommit e6c42bf697ea1cb82177ab41a5f4ef0cce6d25ac[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Thu Nov 28 21:28:23 2024 +0700
+
+    update
+
+[33mcommit 0210d9e83edb6299dafa68fb20805f8ccd7feafc[m
+Merge: 33d10ff d05902e
+Author: “MinhTri07” <minhtri472k4@gmail.com>
+Date:   Thu Nov 28 19:00:23 2024 +0700
+
+    Merge branch 'develop' of https://github.com/binhfnguyeen/PhongKhamTu into develop
+
+[33mcommit 33d10ffbe75d45815f183139a4bd1e734f4cba86[m
+Author: “MinhTri07” <minhtri472k4@gmail.com>
+Date:   Thu Nov 28 19:00:06 2024 +0700
+
+    tao template + base
+
+[33mcommit d05902e8493500e66368bfde2f4565d5abd78914[m
+Merge: 06cf687 86b1547
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Mon Nov 25 21:11:17 2024 +0700
+
+    Merge remote-tracking branch 'origin/develop' into develop
+
+[33mcommit 06cf687c0122db4cbb45c8a90aef2ba16cb92401[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Mon Nov 25 21:10:24 2024 +0700
+
+    add class models
+
+[33mcommit 86b1547e91c87ef96a6c7168658aa3a791412eef[m
+Author: Châu Bình Nguyên <116185923+binhfnguyeen@users.noreply.github.com>
+Date:   Mon Nov 25 16:24:35 2024 +0700
+
+    Update README.md
+
+[33mcommit a8c051115cedf5a2c5e0f801b95e8d574ac1994a[m
+Author: Châu Bình Nguyên <116185923+binhfnguyeen@users.noreply.github.com>
+Date:   Mon Nov 25 16:23:59 2024 +0700
+
+    Update README.md
+
+[33mcommit 7eac1c0cf706e8e7a8582b0c26627a35950ae5bc[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Mon Nov 25 16:22:17 2024 +0700
+
+    update
+
+[33mcommit 7756640b1c027fcb4ee3934190bdaef2adc8493a[m
+Author: nguyendzaii16112004@gmail.com <nguyendzaii16112004@gmail.com>
+Date:   Mon Nov 25 13:22:54 2024 +0700
+
+    update structrure app
+
+[33mcommit 6c6d6d1e1f4c2e2e7ef9a185cb7dff78af891d98[m[33m ([m[1;32mmain[m[33m)[m
+Author: Châu Bình Nguyên <116185923+binhfnguyeen@users.noreply.github.com>
+Date:   Mon Nov 25 12:45:22 2024 +0700
+
+    Initial commit

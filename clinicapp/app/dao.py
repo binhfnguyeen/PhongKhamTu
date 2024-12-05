@@ -84,7 +84,7 @@ def update_profile(user_id, name, gioiTinh, ngaySinh, cccd, diaChi, sdt):
         bacsi.cccd = cccd
         bacsi.diaChi = diaChi
         bacsi.sdt = sdt
-        bacsi.session.commit()
+        db.session.commit()
 
     if thungan:
         thungan.hoTen = name
