@@ -2,6 +2,250 @@
 
 {% block title %} Home {% endblock %}
 
-{% block content %}
-    <h1> Đây là trang chủ <span class="badge text-bg-secondary">New</span></h1>
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock %}
+
+{% block content %}
+<form>
+    <section id="hero" class="d-flex flex-column justify-content-center align-items-center text-white py-5 bg-primary"
+             style="background-image: url(https://res.cloudinary.com/dwivkhh8t/image/upload/v1733393358/banner_phongkham_txfvas.jpg); background-size: cover; background-position: center;">
+        <h1 class="display-4 fw-bold" style="color: black;">Chào Mừng Đến Phòng Khám ABC</h1>
+        <p class="lead" style="color: black;">Dịch vụ y tế chất lượng với đội ngũ bác sĩ chuyên nghiệp</p>
+        <a href="javascript:void(0);" class="btn btn-light btn-lg mt-3 shadow-lg" id="scheduleButton">Đặt Lịch Khám</a>
+    </section>
+
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 class="text-center mb-4">Đặt Lịch Khám</h2>
+            <form>
+                <div class="row justify-content-center">
+                    <div class="col-md-10 col-lg-10">
+                        <div class="form-group mb-3">
+                            <label for="name" class="form-label">Họ và Tên</label>
+                            <input type="text" class="form-control" id="name" placeholder="Nhập họ và tên" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="sdt" class="form-label">Số Điện Thoại</label>
+                            <input type="text" class="form-control" id="sdt" placeholder="Nhập số điện thoại" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="ngaysinh" class="form-label">Ngày Sinh</label>
+                                    <input type="date" class="form-control" id="ngaysinh" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="gioitinh" class="form-label">Giới Tính</label>
+                                    <select class="form-select" id="gioitinh" required>
+                                        <option value="1">Nam</option>
+                                        <option value="0">Nữ</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="ngaydatlich" class="form-label">Ngày Đặt Lịch</label>
+                                    <input type="date" class="form-control" id="ngaydatlich" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="diachi" class="form-label">Địa Chỉ</label>
+                            <input type="text" class="form-control" id="diachi" placeholder="Nhập địa chỉ" required>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-light btn-lg mt-3 shadow-lg w-100" id="btnGui">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <section id="health-check" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Lợi ích khi tham gia chương trình Tầm Soát Sức Khỏe</h2>
+
+            <ul class="list-group text-center">
+                <!-- Nhanh & Tiện -->
+                <li class="list-group-item mb-3">
+                    <strong>Nhanh & Tiện</strong>: Quy trình tầm soát bệnh chỉ mất 90 phút, giúp bạn tiết kiệm tối đa
+                    thời gian chờ đợi.
+                </li>
+
+                <!-- Bác Sĩ Tận Tâm -->
+                <li class="list-group-item mb-3">
+                    <strong>Bác Sĩ Tận Tâm</strong>: Đội ngũ bác sĩ dành thời gian giải thích chi tiết, giúp bạn hiểu rõ
+                    về tình trạng sức khỏe của mình.
+                </li>
+
+                <!-- Trang Thiết Bị Hiện Đại -->
+                <li class="list-group-item mb-3">
+                    <strong>Trang Thiết Bị Hiện Đại</strong>: Phát hiện sớm các nguy cơ sức khỏe tiềm ẩn, trước khi
+                    chúng trở nên nghiêm trọng.
+                </li>
+
+                <!-- Chăm Sóc Tận Tình -->
+                <li class="list-group-item mb-3">
+                    <strong>Chăm Sóc Tận Tình</strong>: Trợ lý bác sĩ sẽ đồng hành cùng bạn trong suốt quá trình khám và
+                    sau đó, giúp bạn duy trì sự khỏe mạnh.
+                </li>
+
+                <!-- Chuyên Gia Hàng Đầu -->
+                <li class="list-group-item mb-3">
+                    <strong>Chuyên Gia Hàng Đầu</strong>: Doctor Check kết nối bạn với các chuyên gia hàng đầu trong
+                    trường hợp phát hiện ung thư, bệnh lạ, bệnh khó.
+                </li>
+            </ul>
+        </div>
+    </section>
+
+
+    <section id="gallery" class="py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Hình Ảnh Phòng Khám</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="gallery-item">
+                        <img class="img-fluid rounded shadow-sm gallery-img"
+                             src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1733385867/phongkham1_pufuxt.png"
+                             alt="Gallery 1">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-item">
+                        <img class="img-fluid rounded shadow-sm gallery-img"
+                             src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1733385886/phongkham2_o1olu8.jpg"
+                             alt="Gallery 2">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-item">
+                        <img class="img-fluid rounded shadow-sm gallery-img"
+                             src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1733385895/phongkham3_maixvn.jpg"
+                             alt="Gallery 3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="mb-4">Đánh Giá Từ Bệnh Nhân</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <div class="card shadow-sm border-light rounded text-center testimonial-card"
+                         style="width: 90%; max-width: 350px; margin: 0 auto;">
+                        <div class="card-img-wrapper" style="width: 50%; margin: 0 auto;">
+                            <img class="img-fluid"
+                                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1732608371/samples/man-portrait.jpg"
+                                 alt="Card image" style="height: 200px; object-fit: cover; width: 100%;">
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">Ngô Lệ</h4>
+                            <p class="card-text">Luôn nhận được sự ân cần và nhẹ nhàng từ bác sĩ, các mom đi khám khi
+                                gặp vấn đề gì có thể hỏi trực tiếp hoặc nhắn tin đều được bác Gái giải đáp..</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <div class="card shadow-sm border-light rounded text-center testimonial-card"
+                         style="width: 90%; max-width: 350px; margin: 0 auto;">
+                        <div class="card-img-wrapper" style="width: 50%; margin: 0 auto;">
+                            <img class="img-fluid"
+                                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1732608363/samples/people/boy-snow-hoodie.jpg"
+                                 alt="Card image" style="height: 200px; object-fit: cover; width: 100%;">
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">John Doe</h4>
+                            <p class="card-text">Cơ sở vật chất tốt, dịch vụ 10 điểm</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <div class="card shadow-sm border-light rounded text-center testimonial-card"
+                         style="width: 90%; max-width: 350px; margin: 0 auto;">
+                        <div class="card-img-wrapper" style="width: 50%; margin: 0 auto;">
+                            <img class="img-fluid"
+                                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1732608371/samples/upscale-face-1.jpg"
+                                 alt="Card image" style="height: 200px; object-fit: cover; width: 100%;">
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">Lệ Quyên</h4>
+                            <p class="card-text">Chuyên môn cao</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="footers">
+        <div class="container py-5">
+            <div class="lienhe text-center mb-4">
+                <strong>LIÊN HỆ VỚI CHÚNG TÔI:</strong>
+            </div>
+            <div class="lienhe1 text-center mb-5">
+                Cảm ơn bạn đã ghé thăm website. Nếu bạn muốn nhận được thông báo từ chúng tôi dễ dàng, hãy điền vào form
+                dưới đây.
+            </div>
+
+            <div class="footer row">
+                <div class="col-md-6 mb-4">
+                    <div class="map-container">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3920.764100538581!2d106.68809457408616!3d10.675409961050816!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31753100099ce9ed%3A0xdb6079801f0735ea!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBN4bufIFRQLiBI4buTIENow60gTWluaCAoY8ahIHPhu58gMyk!5e0!3m2!1svi!2s!4v1730307399182!5m2!1svi!2s"
+                                width="100%" height="220" style="border:0;" allowfullscreen="" loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="foot4s">
+                        <div class="d-flex mb-3">
+                            <input type="text" class="form-control me-2" placeholder="Nhập tên"/>
+                            <input type="email" class="form-control" placeholder="Nhập email"/>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <input type="text" class="form-control me-2" placeholder="Chủ đề"/>
+                            <input type="text" class="form-control" placeholder="Nội dung..."/>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</form>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.getElementById('scheduleButton').addEventListener('click', function() {
+        document.getElementById('appointmentModal').style.display = 'flex';
+    });
+
+    // Đóng modal khi nhấp vào nút đóng (x)
+    document.getElementById('closeModal').addEventListener('click', function() {
+        document.getElementById('appointmentModal').style.display = 'none';
+    });
+
+    // Đóng modal khi nhấp vào ngoài modal
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('appointmentModal')) {
+            document.getElementById('appointmentModal').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}  khi tôi bấm nút Đặt lịch khám mới hiện form lên
