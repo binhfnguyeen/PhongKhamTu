@@ -1,9 +1,96 @@
 {% extends "layout/base.html" %}
 
-{% block title %} Home {% endblock %}
+{% block title %} Đăng ký Lịch khám {% endblock %}
+
+{% block css %}{% endblock %}
 
 {% block content %}
-    <div class="container-fluid">
-        <h1 class="text-center">ĐẶT LỊCH KHÁM</h1>
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+            <h2 class="mb-0">Đăng Ký Lịch Khám</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/taolichhen" enctype="multipart/form-data">
+
+                <h5 class="text-primary mb-3">Thông Tin Cá Nhân</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="hoTen" class="form-label">Họ và Tên</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="hoTen" name="hoTen"
+                                   value="{{ user_info.hoTen if user_info else '' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ngaySinh" class="form-label">Ngày Sinh</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-calendar"></i></span>
+                            <input type="date" class="form-control" id="ngaySinh" name="ngaySinh"
+                                   value="{{ user_info.ngaySinh if user_info else '' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="gioiTinh" class="form-label">Giới Tính</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-gender-ambiguous"></i></span>
+                            <select class="form-control" id="gioiTinh" name="gioiTinh" disabled>
+                                <option value="1" {% if user_info.gioiTinh == 1 %}selected{% endif %}>Nam</option>
+                                <option value="0" {% if user_info.gioiTinh == 0 %}selected{% endif %}>Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="diaChi" class="form-label">Địa Chỉ</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" class="form-control" id="diaChi" name="diaChi"
+                                   value="{{ user_info.diaChi if user_info.diaChi else '' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="sdt" class="form-label">Số Điện Thoại</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                            <input type="text" class="form-control" id="sdt" name="sdt"
+                                   value="{{ user_info.sdt if user_info else '' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="cccd" class="form-label">CCCD</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-card-heading"></i></span>
+                            <input type="text" class="form-control" id="cccd" name="cccd"
+                                   value="{{ user_info.cccd if user_info else '' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="text-primary mt-4 mb-3">Thông Tin Đăng Ký</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="ngayDangKy" class="form-label">Ngày Đăng Ký</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-calendar-check"></i></span>
+                            <input type="date" class="form-control" id="ngayDangKy" name="ngayDangKy" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary px-5">
+                        <i class="bi bi-check-circle"></i> Đăng Ký
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 {% endblock %}

@@ -1,0 +1,240 @@
+{% extends "layout/base.html" %}
+
+{% block title %} Danh sách lịch khám {% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div aria-live="polite" aria-atomic="true" class="position-relative">
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+                {% for category, message in messages %}
+                    <div class="toast align-items-center text-bg-{{ category if category != 'danger' else 'danger' }} border-0 mb-2"
+                         role="alert"
+                         aria-live="assertive"
+                         aria-atomic="true"
+                         data-bs-delay="3000"
+                         data-bs-autohide="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="container mt-5">
+    <div class="row g-4">
+
+        <div class="col-lg-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Lịch Khám Đăng Ký</h4>
+                </div>
+                <div class="card-body">
+                    {% if danhsach %}
+                    <table class="table table-hover table-bordered align-middle text-center">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>STT</th>
+                            <th>Họ và tên</th>
+                            <th>Giới tính</th>
+                            <th>Ngày sinh</th>
+                            <th>Địa chỉ</th>
+                            <th>Ngày Đăng Ký</th>
+                            <th>Ngày Khám</th>
+                            <th>Chọn</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for lich in danhsach %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ lich.benhnhan_name }}</td>
+                            <td>{{ "Nam" if lich.benhnhan_gioitinh else "Nữ" }}</td>
+                            <td>{{ lich.benhnhan_ngaysinh }}</td>
+                            <td>{{ lich.benhnhan_diachi }}</td>
+                            <td>{{ lich.ngayDangKy.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if lich.ngayKham %}
+                                {{ lich.ngayKham.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                <span class="text-danger">Chưa xác định</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST" action="/chonlichkham">
+                                    <input type="hidden" name="lichkham_id" value="{{ lich.idLichKham }}">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-check-circle"></i> Chọn
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-warning text-center">
+                        Không có lịch khám nào cần chọn.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">Lịch Khám Được Chọn</h4>
+                </div>
+                <div class="card-body">
+                    {% if lichkham_duoc_chon %}
+                    <table class="table table-hover table-bordered align-middle text-center">
+                        <thead class="table-success">
+                        <tr>
+                            <th>STT</th>
+                            <th>Họ và tên</th>
+                            <th>Giới tính</th>
+                            <th>Ngày sinh</th>
+                            <th>Địa chỉ</th>
+                            <th>Ngày Đăng Ký</th>
+                            <th>Ngày Khám</th>
+                            <th>Thêm ngày khám</th>
+                            <th>Xóa</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for lich in lichkham_duoc_chon %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ lich.hoTen }}</td>
+                            <td>{{ lich.gioiTinh }}</td>
+                            <td>{{ lich.ngaySinh }}</td>
+                            <td>{{ lich.diaChi }}</td>
+                            <td>{{ lich['ngayDangKy'] }}</td>
+                            <td>{{ lich['ngayKham'] }}</td>
+                            <td>
+                                <form method="POST" action="/themngaykham" class="d-flex align-items-center">
+                                    <input type="hidden" name="lichkham_id" value="{{ lich['idLichKham'] }}">
+                                    <input type="date" class="form-control form-control-sm d-inline-block w-auto"
+                                           name="ngayKham"
+                                           value="{{ lich['ngayKham'] if lich['ngayKham'] != 'Chưa xác định' }}"
+                                           required>
+                                    <button type="submit" class="btn btn-outline-warning btn-sm ms-2">
+                                        <i class="bi bi-pencil-square"></i> Cập nhật
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="POST" action="/xoalichkham">
+                                    <input type="hidden" name="lichkham_id" value="{{ lich['idLichKham'] }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash3"></i> Xóa
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-warning text-center">
+                        Không có lịch khám nào được chọn.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-2 mb-2">
+        <div class="row g-3">
+            <div class="col-sm-12 d-flex justify-content-end gap-3">
+                <button type="button" class="btn btn-outline-success" id="show_danhsach_kham">Tạo danh sách</button>
+                <button type="button" class="btn btn-outline-danger" id="hide_danhsach_kham" style="display: none;">
+                    Hủy
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Danh sach kham -->
+<div class="container mt-4 mb-4" id="danh_sach_kham" style="display: none;">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0">Danh Sách Khám Bệnh</h4>
+                </div>
+                <div class="card-body">
+                    {% if lichkham_duoc_chon %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle text-center">
+                            <thead class="table-success">
+                            <tr>
+                                <th>STT</th>
+                                <th>Họ và tên</th>
+                                <th>Giới tính</th>
+                                <th>Ngày sinh</th>
+                                <th>Địa chỉ</th>
+                                <th>Ngày Khám</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for lich in lichkham_duoc_chon %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ lich.hoTen }}</td>
+                                <td>{{ lich.gioiTinh }}</td>
+                                <td>{{ lich.ngaySinh }}</td>
+                                <td>{{ lich.diaChi }}</td>
+                                <td>{{ lich['ngayKham'] }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning text-center">
+                        Không có dữ liệu danh sách khám.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer d-flex justify-content-end py-3">
+                    <button type="button" class="btn btn-danger btn-sm" id="xuat_pdf">
+                        <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.getElementById("show_danhsach_kham").addEventListener("click", function() {
+        document.getElementById("danh_sach_kham").style.display = "block";
+        document.getElementById("show_danhsach_kham").style.display = "none";
+        document.getElementById("hide_danhsach_kham").style.display = "inline-block";
+    });
+
+    document.getElementById("hide_danhsach_kham").addEventListener("click", function() {
+        document.getElementById("danh_sach_kham").style.display = "none";
+        document.getElementById("show_danhsach_kham").style.display = "inline-block";
+        document.getElementById("hide_danhsach_kham").style.display = "none";
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElements = document.querySelectorAll('.toast');
+        toastElements.forEach(function (toastElement) {
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        });
+    });
+</script>
+{% endblock %}

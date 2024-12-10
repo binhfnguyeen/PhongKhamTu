@@ -40,19 +40,31 @@ class NhanVien(NguoiDung, UserMixin):
 class YTa(NhanVien):
     idYTa = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
 
+    def get_id(self):
+        return (self.idYTa)
+
 
 class BacSi(NhanVien):
     idBacSi = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
     chuyenKhoa = Column(String(50))
 
+    def get_id(self):
+        return (self.idBacSi)
+
 
 class ThuNgan(NhanVien):
     idThuNgan = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
+
+    def get_id(self):
+        return (self.idThuNgan)
 
 
 class QuanTri(NhanVien):
     idQuanTri = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
     phongBan = Column(String(50))
+
+    def get_id(self):
+        return (self.idQuanTri)
 
 
 class HoSoBenhNhan(db.Model):
@@ -67,8 +79,10 @@ class LichKham(db.Model):
     ngayDangKy = Column(DATE)
     ngayKham = Column(DATE)
     id_benhnhan = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
-    id_yta = Column(Integer, ForeignKey(YTa.idYTa), nullable=False)
+    id_yta = Column(Integer, ForeignKey(YTa.idYTa), nullable=True)
 
+    yta = db.relationship('YTa', backref='lichkhams', lazy=True)
+    benhnhan = db.relationship('BenhNhan', backref='lichkhams')
 
 class DonVi(DonViEnum):
     VIEN = 1
@@ -130,14 +144,14 @@ if __name__ == '__main__':
         # yta = YTa(
         #     bangCap="Trung cấp Y tế",
         #     ngayVaoLam="2020-03-01",
-        #     hoTen="Nguyen Thi B",
-        #     username="yta_b",
+        #     hoTen="Tran To B",
+        #     username="yta_tob",
         #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
         #     gioiTinh=False,
         #     ngaySinh="1995-05-12",
-        #     cccd="123456789012",
+        #     cccd="095256781812",
         #     diaChi="123 Đường ABC, Quận 1",
-        #     sdt="0987654321",
+        #     sdt="0987654441",
         # )
         #
         # db.session.add(yta)
