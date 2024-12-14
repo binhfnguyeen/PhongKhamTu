@@ -80,7 +80,6 @@ class LichKham(db.Model):
     ngayKham = Column(DATE)
     id_benhnhan = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
     id_yta = Column(Integer, ForeignKey(YTa.idYTa), nullable=True)
-
     yta = db.relationship('YTa', backref='lichkhams', lazy=True)
     benhnhan = db.relationship('BenhNhan', backref='lichkhams')
 
