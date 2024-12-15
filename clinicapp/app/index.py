@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, jsonify, session, flash
+from flask import render_template, request, redirect, session, flash
 from sqlalchemy.sql.functions import current_user
 from clinicapp.app import app, login
 import dao
@@ -16,20 +16,69 @@ def login_process():
     if request.method.__eq__("POST"):
         username = request.form.get('username')
         password = request.form.get('password')
-        user = dao.auth_user(username=username, password=password)
+        user = dao.auth_user(username=username, password=password, role="benhnhan")
+        yta = dao.auth_user(username=username, password=password, role="yta")
+        bacsi = dao.auth_user(username=username, password=password, role="bacsi")
+        thungan = dao.auth_user(username=username, password=password, role="thungan")
+        quantri = dao.auth_user(username=username, password=password, role="quantri")
+
         if user:
             login_user(user)
             return redirect('/')
-        else:
-            flash('Đăng nhập thất bại! Kiểm tra tên đăng nhập và mật khẩu.', 'danger')
 
+        if yta:
+            login_user(yta)
+            return redirect('/')
+
+        if bacsi:
+            login_user(bacsi)
+            return redirect('/')
+
+        if thungan:
+            login_user(thungan)
+            return redirect('/')
+
+        if quantri:
+            login_user(quantri)
+            return redirect('/')
+
+    flash('Đăng nhập thất bại! Kiểm tra tên đăng nhập và mật khẩu.', 'danger')
     return render_template('login.html')
+
+@app.route("/login-admin", methods=['post'])
+def login_admin_process():
+    if request.method.__eq__("POST"):
+        username = request.form.get('username')
+        password = request.form.get('password')
+        quantri = dao.auth_user(username=username, password=password, role="quantri")
+        if quantri:
+            login_user(quantri)
+            print(f"Logged in user: {current_user}")
+            flash('Đăng nhập thành công!', 'success')
+            return redirect('/admin')
+
+        flash('Đăng nhập thất bại! Kiểm tra tên đăng nhập và mật khẩu.', 'danger')
+        return redirect('/admin')
 
 
 @app.route('/logout')
 def logout_process():
-    logout_user()
+    if current_user.is_authenticated:
+        logout_user()
+        flash('Đăng xuất thành công!', 'success')
+    else:
+        flash('Bạn chưa đăng nhập!', 'warning')
     return redirect('/login')
+
+
+@app.route('/logout-admin')
+def logout_admin_process():
+    if current_user.is_authenticated and current_user.idQuanTri:
+        logout_user()
+        flash('Đăng xuất thành công!', 'success')
+    else:
+        flash('Bạn chưa đăng nhập!', 'warning')
+    return redirect('/admin')
 
 
 @app.route('/register', methods=['get', 'post'])
@@ -97,49 +146,55 @@ def update_profile():
             else:
                 ngaysinh = None
 
-            if hasattr(current_user, 'idBenhNhan') and current_user.idBenhNhan:
-                dao.update_profile(
-                    user_id=current_user.idBenhNhan,
-                    name=name.strip(),
-                    gioiTinh=gioitinh,
-                    ngaySinh=ngaysinh,
-                    cccd=cccd.strip(),
-                    diaChi=diachi.strip(),
-                    sdt=sdt.strip()
-                )
-            elif hasattr(current_user, 'idYTa') and current_user.idYTa:
-                dao.update_profile(
-                    user_id=current_user.idYTa,
-                    name=name.strip(),
-                    gioiTinh=gioitinh,
-                    ngaySinh=ngaysinh,
-                    cccd=cccd.strip(),
-                    diaChi=diachi.strip(),
-                    sdt=sdt.strip()
-                )
-            elif hasattr(current_user, 'idBacSi') and current_user.idBacSi:
-                dao.update_profile(
-                    user_id=current_user.idBacSi,
-                    name=name.strip(),
-                    gioiTinh=gioitinh,
-                    ngaySinh=ngaysinh,
-                    cccd=cccd.strip(),
-                    diaChi=diachi.strip(),
-                    sdt=sdt.strip()
-                )
-            elif hasattr(current_user, 'idThuNgan') and current_user.idThuNgan:
-                dao.update_profile(
-                    user_id=current_user.idThuNgan,
-                    name=name.strip(),
-                    gioiTinh=gioitinh,
-                    ngaySinh=ngaysinh,
-                    cccd=cccd.strip(),
-                    diaChi=diachi.strip(),
-                    sdt=sdt.strip()
-                )
+            try:
+                if hasattr(current_user, 'idBenhNhan') and current_user.idBenhNhan:
+                    dao.update_profile(
+                        user_id=current_user.idBenhNhan,
+                        name=name.strip(),
+                        gioiTinh=gioitinh,
+                        ngaySinh=ngaysinh,
+                        cccd=cccd.strip(),
+                        diaChi=diachi.strip(),
+                        sdt=sdt.strip()
+                    )
+                elif hasattr(current_user, 'idYTa') and current_user.idYTa:
+                    dao.update_profile(
+                        user_id=current_user.idYTa,
+                        name=name.strip(),
+                        gioiTinh=gioitinh,
+                        ngaySinh=ngaysinh,
+                        cccd=cccd.strip(),
+                        diaChi=diachi.strip(),
+                        sdt=sdt.strip()
+                    )
+                elif hasattr(current_user, 'idBacSi') and current_user.idBacSi:
+                    dao.update_profile(
+                        user_id=current_user.idBacSi,
+                        name=name.strip(),
+                        gioiTinh=gioitinh,
+                        ngaySinh=ngaysinh,
+                        cccd=cccd.strip(),
+                        diaChi=diachi.strip(),
+                        sdt=sdt.strip()
+                    )
+                elif hasattr(current_user, 'idThuNgan') and current_user.idThuNgan:
+                    dao.update_profile(
+                        user_id=current_user.idThuNgan,
+                        name=name.strip(),
+                        gioiTinh=gioitinh,
+                        ngaySinh=ngaysinh,
+                        cccd=cccd.strip(),
+                        diaChi=diachi.strip(),
+                        sdt=sdt.strip()
+                    )
+                flash("Lưu thông tin thành công!", "success")
+                return redirect('/trangcanhan')
 
-            return redirect('/trangcanhan')
+            except Exception as e:
+                flash("Lưu sai thông tin!", "danger")
+                return redirect('/trangcanhan')
 
+    flash("Lưu thông tin không thành công!", "warning")
     return render_template("login.html")
 
 
@@ -147,20 +202,30 @@ def update_profile():
 def get_user_by_id(user_id):
     user = dao.get_id_user(user_id)
     if user:
+        print(f"Found BenhNhan: {user}")
         return user
 
     yta = dao.get_id_yta(user_id)
     if yta:
+        print(f"Found YTa: {yta}")
         return yta
 
     bacsi = dao.get_id_bacsi(user_id)
     if bacsi:
+        print(f"Found BacSi: {bacsi}")
         return bacsi
 
     thungan = dao.get_id_thungan(user_id)
     if thungan:
+        print(f"Found ThuNgan: {thungan}")
         return thungan
 
+    quantri = dao.get_id_quantri(user_id)
+    if quantri:
+        print(f"Found QuanTri: {quantri}")
+        return quantri
+
+    print("No user found")
     return None
 
 
@@ -182,8 +247,20 @@ def make_a_appointment():
         if current_user.is_authenticated:
             user_id = current_user.idBenhNhan
             ngayDangKy = request.form.get('ngayDangKy')
-            result = dao.update_lichkham(user_id, ngayDangKy, ngayKham=None, idYTa=None)
-            return redirect('/')
+
+            try:
+                result = dao.update_lichkham(user_id, ngayDangKy, ngayKham=None, idYTa=None)
+                if result:
+                    flash("Đăng ký lịch hẹn thành công!", "success")
+                else:
+                    flash("Không thể đăng ký lịch hẹn. Vui lòng thử lại!", "warning")
+            except Exception as e:
+                flash(f"Đã xảy ra lỗi khi tạo lịch hẹn: {str(e)}", "danger")
+
+            return redirect('/datlichkham')
+
+    flash("Bạn cần đăng nhập để tạo lịch hẹn!", "warning")
+    return redirect('/login')
 
 
 @app.route('/dsk_benhnhan')
@@ -284,4 +361,5 @@ def thanhtoan():
 
 
 if __name__ == '__main__':
+    from clinicapp.app import admin
     app.run(debug=True)

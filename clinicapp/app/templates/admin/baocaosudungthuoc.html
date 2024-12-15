@@ -1,0 +1,116 @@
+{% extends 'admin/master.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style>
+    .form-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 40%;
+    }
+    .form-container input[type="month"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .report-header {
+        text-align: center;
+        margin-top: 20px;
+        color: #5a5a5a;
+    }
+    table {
+        margin-top: 30px;
+        background-color: #ffffff;
+    }
+    th {
+        background-color: #f1f1f1;
+        color: #333;
+        text-align: center;
+    }
+    td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .btn-submit {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .btn-submit:focus {
+        outline: none;
+    }
+</style>
+{% endblock head_css %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="form-container">
+        <h4 class="text-center mb-3">BÁO CÁO SỬ DỤNG THUỐC</h4>
+        <form method="POST" action="#">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="month_year_baocao" class="labels">Chọn tháng và năm</label>
+                    <div class="input-group">
+                        <input type="month" class="form-control form-control-sm" name="month_year_baocao"
+                               placeholder="Chọn tháng và năm" value="" id="month_year_baocao">
+                    </div>
+                </div>
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-submit btn-sm">Xem Báo Cáo</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    {% if month and year %}
+    <h2 class="report-header">BÁO CÁO SỬ DỤNG THUỐC THEO THÁNG</h2>
+    <h3 class="report-header">Tháng {{ month }} Năm {{ year }}</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>STT</th>
+            <th>Thuốc</th>
+            <th>Đơn vị tính</th>
+            <th>Số lượng</th>
+            <th>Số lần dùng</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in report_data %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ row.ngay_kham }}</td>
+            <td>{{ row.so_benh_nhan }}</td>
+            <td>{{ row.doanh_thu }}</td>
+            <td>{{ row.tyle * 100 }}%</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h3>Tổng doanh thu: {{ tong_doanh_thu }} VNĐ</h3>
+    {% endif %}
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-12 d-flex justify-content-center">
+        <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
+    </div>
+</div>
+{% endblock %}

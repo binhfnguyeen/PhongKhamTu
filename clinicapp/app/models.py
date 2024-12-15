@@ -1,13 +1,13 @@
 from datetime import date
 
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE, Enum
-# from sqlalchemy.orm import relationship
 from enum import Enum as DonViEnum
 from clinicapp.app import app, db
 from flask_login import UserMixin
 
 
 class NguoiDung(db.Model):
+    __table_args__ = {"extend_existing": True}
     __abstract__ = True
     hoTen = Column(String(50), nullable=False)
     username = Column(String(50), nullable=False, unique=True)
@@ -22,6 +22,7 @@ class NguoiDung(db.Model):
 
 
 class BenhNhan(NguoiDung, UserMixin):
+    __table_args__ = {"extend_existing": True}
     idBenhNhan = Column(Integer, primary_key=True, autoincrement=True)
 
     def get_id(self):
@@ -29,6 +30,7 @@ class BenhNhan(NguoiDung, UserMixin):
 
 
 class NhanVien(NguoiDung, UserMixin):
+    __table_args__ = {"extend_existing": True}
     idNhanVien = Column(Integer, primary_key=True, autoincrement=True)
     bangCap = Column(String(50))
     ngayVaoLam = Column(DATE)
@@ -38,6 +40,7 @@ class NhanVien(NguoiDung, UserMixin):
 
 
 class YTa(NhanVien):
+    __table_args__ = {"extend_existing": True}
     idYTa = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
 
     def get_id(self):
@@ -45,6 +48,7 @@ class YTa(NhanVien):
 
 
 class BacSi(NhanVien):
+    __table_args__ = {"extend_existing": True}
     idBacSi = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
     chuyenKhoa = Column(String(50))
 
@@ -53,6 +57,7 @@ class BacSi(NhanVien):
 
 
 class ThuNgan(NhanVien):
+    __table_args__ = {"extend_existing": True}
     idThuNgan = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
 
     def get_id(self):
@@ -60,6 +65,7 @@ class ThuNgan(NhanVien):
 
 
 class QuanTri(NhanVien):
+    __table_args__ = {"extend_existing": True}
     idQuanTri = Column(Integer, ForeignKey(NhanVien.idNhanVien), nullable=False, primary_key=True)
     phongBan = Column(String(50))
 
@@ -83,6 +89,7 @@ class LichKham(db.Model):
 
     yta = db.relationship('YTa', backref='lichkhams', lazy=True)
     benhnhan = db.relationship('BenhNhan', backref='lichkhams')
+
 
 class DonVi(DonViEnum):
     VIEN = 1
@@ -126,37 +133,23 @@ if __name__ == '__main__':
         db.create_all()
 
         import hashlib
-        # benh_nhan = BenhNhan(
-        #     hoTen="Nguyễn Văn A",
-        #     username="nguyenvana",
-        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #     gioiTinh=True,  # True cho nam, False cho nữ
-        #     ngaySinh=date(1990, 1, 1),
-        #     cccd="123456789012",
-        #     diaChi="Hà Nội",
-        #     sdt="0123456789",
-        # )
-        #
-        # # Thêm vào cơ sở dữ liệu và commit
-        # db.session.add(benh_nhan)
-        # db.session.commit()
-        #
+
         # yta = YTa(
         #     bangCap="Trung cấp Y tế",
         #     ngayVaoLam="2020-03-01",
-        #     hoTen="Tran To B",
-        #     username="yta_tob",
+        #     hoTen="Tran Ha Linh",
+        #     username="yta_halinh",
         #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
         #     gioiTinh=False,
         #     ngaySinh="1995-05-12",
-        #     cccd="095256781812",
+        #     cccd="095446781888",
         #     diaChi="123 Đường ABC, Quận 1",
-        #     sdt="0987654441",
+        #     sdt="0987651010",
         # )
         #
         # db.session.add(yta)
         # db.session.commit()
-        #
+
         # bac_si = BacSi(
         #     ngayVaoLam="2015-06-01",
         #     bangCap="Bác sĩ chuyên khoa I",
@@ -201,6 +194,23 @@ if __name__ == '__main__':
         #     cccd="100056778911",
         #     diaChi="Nguyễn Văn Linh, Quận 7",
         #     sdt="0992443668",
+        #     phongBan="PB_IT"
+        # )
+        #
+        # db.session.add(quan_tri)
+        # db.session.commit()
+
+        # quan_tri = QuanTri(
+        #     ngayVaoLam="2019-11-01",
+        #     bangCap="Cử Nhân",
+        #     hoTen="Ngo Duc Ken",
+        #     username="quantri_kend",
+        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #     gioiTinh=True,
+        #     ngaySinh="1999-11-16",
+        #     cccd="095250177891",
+        #     diaChi="Nguyễn Văn Linh, Quận 7",
+        #     sdt="0992444468",
         #     phongBan="PB_IT"
         # )
         #

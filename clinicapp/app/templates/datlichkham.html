@@ -5,7 +5,32 @@
 {% block css %}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div aria-live="polite" aria-atomic="true" class="position-relative">
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+                {% for category, message in messages %}
+                    <div class="toast align-items-center text-bg-{{ category if category != 'danger' else 'danger' }} border-0 mb-2"
+                         role="alert"
+                         aria-live="assertive"
+                         aria-atomic="true"
+                         data-bs-delay="3000"
+                         data-bs-autohide="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="container mt-5 mb-5">
     <div class="card shadow">
         <div class="card-header bg-primary text-white text-center">
             <h2 class="mb-0">Đăng Ký Lịch Khám</h2>
@@ -93,4 +118,16 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElements = document.querySelectorAll('.toast');
+        toastElements.forEach(function (toastElement) {
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        });
+    });
+</script>
 {% endblock %}

@@ -5,7 +5,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated and current_user.idBenhNhan %}
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="/dsk_benhnhan">Lịch khám</a>
@@ -18,6 +18,30 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
+                </li>
+            </ul>
+            {% elif current_user.is_authenticated and current_user.idYTa %}
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dsk_yta">Danh sách khám</a>
+                </li>
+            </ul>
+            {% elif current_user.is_authenticated and current_user.idBacSi %}
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/lapphieukham">Lập phiếu Khám</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/thanhtoan">Thanh toán</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
+                </li>
+            </ul>
+            {% elif current_user.is_authenticated and current_user.idThuNgan %}
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/thanhtoan">Thanh toán</a>
                 </li>
             </ul>
             {% endif %}

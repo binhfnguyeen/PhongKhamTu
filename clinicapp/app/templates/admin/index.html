@@ -1,0 +1,111 @@
+{% extends 'admin/master.html' %}
+
+{% block head_css %}
+{{ super() }}
+{% endblock head_css %}
+
+{% block body %}
+{% if current_user.is_authenticated and current_user.idQuanTri %}
+<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-width">
+        <div class="modal-content rounded-4 shadow-lg" style="background-color: #f0f4f8;">
+            <div class="modal-body p-5">
+                <div class="text-center">
+                    <h1 class="text-primary display-4 mb-4" style="font-family: 'Roboto', sans-serif; font-weight: bold; color: #007bff;">
+                        CHÀO MỪNG ĐẾN VỚI TRANG QUẢN TRỊ!
+                    </h1>
+
+                    <h2 class="text-secondary mb-4" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #6c757d;">
+                        Xin chào <span class="text-info">@{{ current_user.username }}</span>!
+                    </h2>
+                    <p class="text-muted" style="font-size: 1.1rem; color: #868e96;">
+                        Chúng tôi rất vui khi có bạn ở đây. Hãy bắt đầu quản lý hệ thống của bạn ngay hôm nay!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow h-100 py-4 border-left-primary" style="border-radius: 10px; background-color: #f8f9fc;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" style="font-size: 1.1rem;">Số Người Dùng</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.5rem; color: #4e73df;">{{ user_count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow h-100 py-4 border-left-success" style="border-radius: 10px; background-color: #f8f9fc;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 1.1rem;">Số Nhân Viên</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.5rem; color: #1cc88a;">{{ nhan_vien_count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-12 d-flex justify-content-center">
+        <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
+    </div>
+</div>
+
+{% else %}
+<form method="post" action="/login-admin" class="vh-100 gradient-custom mt-1">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white"
+                     style="border-radius: 1.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                    <div class="card-body p-5 text-center">
+
+                        <div class="mb-md-5 mt-md-4 pb-5">
+                            <h2 class="fw-bold mb-4 text-uppercase" style="font-size: 2rem; letter-spacing: 1px;">Đăng
+                                Nhập Admin</h2>
+                            <p class="text-white-50 mb-5" style="font-size: 1rem;">Vui lòng nhập tài khoản và mật khẩu
+                                của Admin để truy cập!</p>
+
+                            <div class="form-outline form-white mb-4">
+                                <label class="form-label" for="username" style="font-size: 1rem;">Tài khoản</label>
+                                <input type="text" id="username" name="username"
+                                       class="form-control form-control-lg"
+                                       style="font-size: 1rem; border-radius: 0.5rem; padding: 0.75rem;"/>
+                            </div>
+
+                            <div class="form-outline form-white mb-4">
+                                <label class="form-label" for="password" style="font-size: 1rem;">Mật khẩu</label>
+                                <input type="password" id="password" name="password"
+                                       class="form-control form-control-lg"
+                                       style="font-size: 1rem; border-radius: 0.5rem; padding: 0.75rem;"/>
+                            </div>
+
+                            <button class="btn btn-light btn-lg px-5 py-2 fw-bold" type="submit"
+                                    style="font-size: 1rem; border-radius: 0.5rem;">Đăng Nhập
+                            </button>
+                        </div>
+
+                        <div>
+                            <p class="mb-0" style="font-size: 0.9rem;">Quên mật khẩu? <a href="#"
+                                                                                         class="text-white-50 fw-bold">Khôi
+                                phục ngay</a></p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

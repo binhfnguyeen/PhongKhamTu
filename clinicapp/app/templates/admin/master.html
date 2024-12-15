@@ -1,0 +1,483 @@
+{% import 'admin/layout.html' as layout with context %}
+{% import 'admin/static.html' as admin_static with context %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% if admin_view.category %}{{ admin_view.category }} - {% endif %}{{ admin_view.name }} -
+        {{ admin_view.admin.name }}{% endblock %}</title>
+
+    {% block head_meta %}{% endblock %}
+
+    {% block head_css %}
+    <link href="{{ admin_static.url(filename='bootstrap/bootstrap4/swatch/{swatch}/bootstrap.min.css'.format(swatch=config.get('FLASK_ADMIN_SWATCH', 'default')), v='4.2.1') }}"
+          rel="stylesheet">
+    {% if config.get('FLASK_ADMIN_SWATCH', 'default') == 'default' %}
+    <link href="{{ admin_static.url(filename='bootstrap/bootstrap4/css/bootstrap.min.css', v='4.2.1') }}"
+          rel="stylesheet">
+    {% endif %}
+    <link href="{{ admin_static.url(filename='admin/css/bootstrap4/admin.css', v='1.1.1') }}" rel="stylesheet">
+    <link href="{{ admin_static.url(filename='bootstrap/bootstrap4/css/font-awesome.min.css', v='4.7.0') }}"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    {% if admin_view.extra_css %}
+    {% for css_url in admin_view.extra_css %}
+    <link href="{{ css_url }}" rel="stylesheet">
+    {% endfor %}
+    {% endif %}
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        #sidebar {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 999;
+            background: #343a40;
+            color: #fff;
+            transition: all 0.3s;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #sidebar.active {
+            left: -250px;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #212529;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        #sidebar .components {
+            padding: 10px;
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        #sidebar .components li a {
+            color: #ecf0f1;
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #sidebar .components li a:hover {
+            background-color: #495057;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        #content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            background-color: #fff;
+            transition: margin-left 0.3s;
+        }
+
+        #content.active {
+            margin-left: 0;
+        }
+
+        .navbar {
+            background-color: #212529;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .navbar .navbar-toggler {
+            border-color: #6c757d;
+        }
+
+        .navbar .navbar-nav .nav-link {
+            color: #ecf0f1;
+        }
+
+        .navbar .navbar-nav .nav-link:hover {
+            color: #fff;
+        }
+
+        .btn-info {
+            background-color: #343a40;
+            border-color: #495057;
+        }
+
+        .btn-info:hover {
+            background-color: #495057;
+            border-color: #343a40;
+        }
+
+        .footer {
+            background-color: #212529;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .footer a {
+            color: #ecf0f1;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .container-bar {
+            display: inline-block;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+        }
+
+        .bar1, .bar2, .bar3 {
+            width: 30px;
+            height: 4px;
+            background-color: #ccc;
+            margin: 6px 0;
+            transition: 0.4s;
+        }
+
+        .change .bar1 {
+            transform: translate(0, 11px) rotate(-45deg);
+            background-color: #fff;
+        }
+
+        .change .bar2 {
+            opacity: 0;
+        }
+
+        .change .bar3 {
+            transform: translate(0, -11px) rotate(45deg);
+            background-color: #fff;
+        }
+
+        .dashboard-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px 0;
+            padding: 5px 10px;
+            background-color: #343a40;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+            }
+
+            #sidebar.active {
+                left: -100%;
+            }
+
+            #content {
+                margin-left: 0;
+            }
+
+            .navbar .navbar-toggler {
+                display: block;
+            }
+
+            .navbar .navbar-nav .nav-link {
+                font-size: 0.9em;
+            }
+
+            .wrapper {
+                flex-direction: column;
+            }
+
+            .container-bar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .dashboard-title {
+                font-size: 1.2em;
+            }
+        }
+
+        .custom-width {
+            max-width: 60%;
+            width: 60%;
+        }
+
+        .modal-content {
+            height: auto;
+            max-height: 70vh;
+            overflow: hidden;
+            transform: translateY(-50px) translateX(15%); /* Dịch chuyển modal sang bên phải */
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .modal-content {
+            transform: translateY(-50px) translateX(15%); /* Dịch chuyển sang bên phải */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0) translateX(15%); /* Giữ modal dịch chuyển khi hiển thị */
+        }
+
+        .modal {
+            z-index: 1051 !important;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            z-index: 1060;
+        }
+
+        .modal-content {
+            z-index: 1060;
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .text-primary, .text-success {
+            font-weight: 600;
+        }
+
+        .text-gray-800 {
+            color: #2e3b4e;
+        }
+
+        .fa-2x, .fa-3x {
+            transition: all 0.3s ease;
+        }
+
+        .fa-3x:hover {
+            transform: scale(1.1);
+        }
+
+        #myChart {
+            max-width: 100%;
+            height: 200px;
+        }
+    </style>
+    {% endblock %}
+
+    {% block head %}{% endblock %}
+    {% block head_tail %}{% endblock %}
+</head>
+
+<body>
+<div class="wrapper">
+    {% block page_body %}
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            {% block brand %}
+            <a class="navbar-brand" style="text-transform: uppercase; color: #ffffff;"
+               href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
+            {% endblock %}
+        </div>
+
+        {% block main_menu %}
+        <ul class="list-unstyled components">
+            <p class="dashboard-title">Dashboard</p>
+            {{ layout.menu() }}
+        </ul>
+        {% endblock %}
+    </nav>
+
+    <!-- Content -->
+    <div id="content">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <div class="container-bar" onclick="myFunction(this)">
+                        <div class="bar1"></div>
+                        <div class="bar2"></div>
+                        <div class="bar3"></div>
+                    </div>
+                </button>
+
+                {% block menu_links %}
+                <ul class="nav navbar-nav navbar-right">
+                    {{ layout.menu_links() }}
+                </ul>
+                {% endblock %}
+            </div>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                {% if current_user.is_authenticated and current_user.idQuanTri %}
+                <div class="dropdown navbar-nav ms-auto">
+                    <button type="button" class="btn btn-light dropdown-toggle d-flex align-items-center"
+                            data-bs-toggle="dropdown">
+                        <img src="{{ current_user.avatar }}" width="30" class="rounded-circle me-2">
+                        <span>Chào {{ current_user.username }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" id="logout" href="/logout-admin">Đăng xuất</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <div class="dropdown navbar-nav ms-auto">
+                    <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                        <span class="text-muted">Chưa đăng nhập</span>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+
+        {% block access_control %}
+        {% endblock %}
+
+        {% block messages %}
+        <div id="messages-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050; display: none;">
+            {{ layout.messages() }}
+        </div>
+        {% endblock %}
+
+        {% set render_ctx = h.resolve_ctx() %}
+
+        {% block body %}{% endblock %}
+    </div>
+    {% endblock %}
+</div>
+
+{% block tail_js %}
+<script src="{{ admin_static.url(filename='vendor/jquery.min.js', v='3.5.1') }}" type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='bootstrap/bootstrap4/js/popper.min.js') }}" type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='bootstrap/bootstrap4/js/bootstrap.min.js', v='4.2.1') }}"
+        type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='vendor/moment.min.js', v='2.9.0') }}" type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='vendor/bootstrap4/util.js', v='4.3.1') }}" type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='vendor/bootstrap4/dropdown.js', v='4.3.1') }}"
+        type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='vendor/select2/select2.min.js', v='4.2.1') }}"
+        type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='vendor/multi-level-dropdowns-bootstrap/bootstrap4-dropdown-ml-hack.js') }}"
+        type="text/javascript"></script>
+<script src="{{ admin_static.url(filename='admin/js/helpers.js', v='1.0.0') }}" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar').toggleClass('active');
+            $('#content').toggleClass('active');
+        });
+    });
+
+    function myFunction(x) {
+        if (!x.classList.contains("change")) {
+            x.classList.add("change");
+        } else {
+            x.classList.remove("change");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const messagesContainer = document.getElementById('messages-container');
+
+        if (messagesContainer) {
+            messagesContainer.style.display = 'block';
+
+            setTimeout(() => {
+                messagesContainer.style.transition = "opacity 0.5s";
+                messagesContainer.style.opacity = 0;
+
+                setTimeout(() => {
+                    messagesContainer.style.display = 'none';
+                }, 500);
+            }, 2000);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+        modal.show();
+    });
+
+    window.onload = function() {
+    const ctx = document.getElementById('myChart');
+
+    new Chart(ctx, {
+            type: 'line',  // Thay 'bar' thành 'line'
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    borderWidth: 2,  // Đặt độ dày đường vẽ
+                    borderColor: 'rgba(75, 192, 192, 1)',  // Màu của đường
+                    fill: false,  // Không tô màu nền dưới đường
+                    tension: 0.1  // Độ cong của đường, có thể điều chỉnh
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+{% if admin_view.extra_js %}
+{% for js_url in admin_view.extra_js %}
+<script src="{{ js_url }}" type="text/javascript"></script>
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block tail %}{% endblock %}
+</body>
+
+</html>
