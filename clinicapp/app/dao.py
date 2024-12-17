@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import func
-from models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, HoaDon
+from models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, HoaDon, Thuoc, ChiTietDonThuoc, PhieuKham
 from clinicapp.app import db, app
 import hashlib
 import cloudinary.uploader
@@ -240,12 +240,10 @@ def thong_ke_theo_ngay(month, year):
     tien_kham = tong_tienkham_theo_ngay_trong_thang(month, year)
     tien_thuoc = tong_tienthuoc_theo_ngay_trong_thang(month, year)
     benh_nhan = tong_benhnhan_theo_ngay_trong_thang(month, year)
-    tong_doanh_thu = 0
 
     report = []
     tong_doanh_thu = 0
     for ngay in tien_kham:
-
         ngay_kham = ngay['ngay_kham']
         tong_tien_kham = ngay['tong_tien_kham']
         tong_tien_thuoc = next((item['tong_tien_thuoc'] for item in tien_thuoc if item['ngay_kham'] == ngay_kham), 0)
@@ -253,12 +251,51 @@ def thong_ke_theo_ngay(month, year):
 
         doanh_thu = tong_tien_kham + tong_tien_thuoc
         tong_doanh_thu += doanh_thu
-        ty_le = (so_benh_nhan / doanh_thu)*100
+        ty_le = (so_benh_nhan / doanh_thu) * 100 if doanh_thu != 0 else 0
+
         report.append({
             'ngay_kham': ngay_kham,
-            'doanh_thu': doanh_thu,
+            'doanh_thu': f"{doanh_thu:,.0f}",
             'so_benh_nhan': so_benh_nhan,
-            'tyle': round(ty_le, 2)
+            'tyle': round(ty_le, 2),
         })
 
-    return report, tong_doanh_thu
+    report.sort(key=lambda x: x['ngay_kham'])
+    return report, f"{tong_doanh_thu:,.0f}"
+
+
+def thong_ke_su_dung_thuoc_theo_ngay(month, year):
+    try:
+        results = db.session.query(
+            Thuoc.tenThuoc,
+            Thuoc.loaiThuoc.label("don_vi"),
+            func.sum(ChiTietDonThuoc.soLuongThuoc).label("tong_so_luong"),
+            func.count(ChiTietDonThuoc.id_thuoc).label("so_lan_dung")
+        ).join(
+            ChiTietDonThuoc, ChiTietDonThuoc.id_thuoc == Thuoc.idThuoc
+        ).join(
+            PhieuKham, ChiTietDonThuoc.id_phieukham == PhieuKham.idPhieuKham
+        ).filter(
+            func.extract("month", PhieuKham.ngayTao) == month,
+            func.extract("year", PhieuKham.ngayTao) == year
+        ).group_by(
+            Thuoc.tenThuoc,
+            Thuoc.loaiThuoc
+        ).order_by(
+            Thuoc.tenThuoc.asc()
+        ).all()
+
+        report = [
+            {
+                "ten_thuoc": r.tenThuoc,
+                "don_vi": r.don_vi.name,
+                "tong_so_luong": r.tong_so_luong,
+                "so_lan_dung": r.so_lan_dung
+            }
+            for r in results
+        ]
+
+        return report
+    except Exception as e:
+        print(f"Lỗi khi thống kê sử dụng thuốc: {e}")
+        return {"status": "error", "message": str(e)}

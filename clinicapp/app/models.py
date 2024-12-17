@@ -216,3 +216,71 @@ if __name__ == '__main__':
         #
         # db.session.add(quan_tri)
         # db.session.commit()
+        #
+        # thuoc1 = Thuoc(
+        #     tenThuoc="Paracetamol",
+        #     loaiThuoc=DonVi.VIEN,
+        #     huongDanSuDung="Uống 1 viên mỗi 6 giờ"
+        # )
+        #
+        # thuoc2 = Thuoc(
+        #     tenThuoc="Vitamin C",
+        #     loaiThuoc=DonVi.VIEN,
+        #     huongDanSuDung="Uống 1 viên mỗi ngày"
+        # )
+        #
+        # thuoc3 = Thuoc(
+        #     tenThuoc="Amoxicillin",
+        #     loaiThuoc=DonVi.CHAI,
+        #     huongDanSuDung="Uống 10ml mỗi 8 giờ"
+        # )
+        #
+        # thuoc4 = Thuoc(
+        #     tenThuoc="Cefuroxime",
+        #     loaiThuoc=DonVi.VY,
+        #     huongDanSuDung="Tiêm 2 mũi mỗi ngày"
+        # )
+        #
+        # db.session.add_all([thuoc1, thuoc2, thuoc3, thuoc4])
+        # db.session.commit()
+        #
+        # hoa_don1 = HoaDon(
+        #     ngayKham="2024-12-01",
+        #     tienKham=500000,
+        #     tienThuoc=200000,
+        #     id_thungan=5
+        # )
+        #
+        # hoa_don2 = HoaDon(
+        #     ngayKham="2024-12-02",
+        #     tienKham=700000,
+        #     tienThuoc=300000,
+        #     id_thungan=5
+        # )
+        #
+        # hoa_don3 = HoaDon(
+        #     ngayKham="2024-12-03",
+        #     tienKham=400000,
+        #     tienThuoc=150000,
+        #     id_thungan=5
+        # )
+        #
+        # db.session.add_all([hoa_don1, hoa_don2, hoa_don3])
+        # db.session.commit()
+
+        # chi_tiet1 = ChiTietDonThuoc(
+        #     id_phieukham=1,
+        #     id_thuoc=1,
+        #     soLuongThuoc=10
+        # )
+        #
+        # chi_tiet2 = ChiTietDonThuoc(
+        #     id_phieukham=2,
+        #     id_thuoc=2,
+        #     soLuongThuoc=5
+        # )
+        #
+        # db.session.add_all([chi_tiet1, chi_tiet2])
+        # db.session.commit()
+
+

@@ -99,18 +99,18 @@
             <td>{{ row.ngay_kham }}</td>
             <td>{{ row.so_benh_nhan }}</td>
             <td>{{ row.doanh_thu }}</td>
-            <td>{{ row.tyle * 100 }}%</td>
+            <td>{{ row.tyle * 100 }}</td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
     <h3>Tổng doanh thu: {{ tong_doanh_thu }} VNĐ</h3>
-    {% endif %}
-</div>
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-12 d-flex justify-content-center">
-        <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-12 d-flex justify-content-center">
+            <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
+        </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
