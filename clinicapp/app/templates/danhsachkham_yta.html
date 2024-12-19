@@ -52,7 +52,7 @@
                         </thead>
                         <tbody>
                         {% for lich in danhsach %}
-                        <tr>
+                        <tr id="lkdangky{{ loop.index }}">
                             <td>{{ loop.index }}</td>
                             <td>{{ lich.benhnhan_name }}</td>
                             <td>{{ "Nam" if lich.benhnhan_gioitinh else "Nữ" }}</td>
@@ -69,7 +69,7 @@
                             <td>
                                 <form method="POST" action="/chonlichkham">
                                     <input type="hidden" name="lichkham_id" value="{{ lich.idLichKham }}">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <button type="submit" onclick="chonLichKham({{ loop.index }})" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-check-circle"></i> Chọn
                                     </button>
                                 </form>
@@ -237,6 +237,5 @@
             toast.show();
         });
     });
-
 </script>
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, session, flash
+from flask import render_template, request, redirect, session, flash, jsonify
 from sqlalchemy.sql.functions import current_user
 from clinicapp.app import app, login
 import dao
@@ -8,7 +8,7 @@ from datetime import datetime
 
 @app.route('/')
 def index():
-    return render_template('home.html')
+    return render_template('home.html', list_comment=dao.load_comment())
 
 
 @app.route('/login', methods=['post', 'get'])
@@ -44,6 +44,7 @@ def login_process():
 
     flash('Đăng nhập thất bại! Kiểm tra tên đăng nhập và mật khẩu.', 'danger')
     return render_template('login.html')
+
 
 @app.route("/login-admin", methods=['post'])
 def login_admin_process():
@@ -278,7 +279,7 @@ def dsk_yta():
         list_lichkham = dao.get_danhsach_lichkham_benhnhan()
         lichkham_duoc_chon = session.get('lichkham_duoc_chon', [])
         return render_template('danhsachkham_yta.html',
-                               danhsach=list_lichkham,lichkham_duoc_chon=lichkham_duoc_chon)
+                               danhsach=list_lichkham, lichkham_duoc_chon=lichkham_duoc_chon)
     else:
         return redirect('/')
 
@@ -299,16 +300,19 @@ def choose_appointment():
     if lichkham_duoc_chon.idLichKham not in list_lichkham_duoc_chon_ids:
         list_lichkham_duoc_chon.append({
             'idLichKham': lichkham_duoc_chon.idLichKham,
+            'idBenhNhan': user_info.idBenhNhan,
             'hoTen': user_info.hoTen,
             'gioiTinh': "Nam" if user_info.gioiTinh else "Nữ",
             'ngaySinh': user_info.ngaySinh.strftime('%d/%m/%Y'),
             'diaChi': user_info.diaChi,
             'ngayDangKy': lichkham_duoc_chon.ngayDangKy.strftime('%d/%m/%Y'),
-            'ngayKham': lichkham_duoc_chon.ngayKham.strftime('%d/%m/%Y') if lichkham_duoc_chon.ngayKham else 'Chưa xác định',
+            'ngayKham': lichkham_duoc_chon.ngayKham.strftime(
+                '%d/%m/%Y') if lichkham_duoc_chon.ngayKham else 'Chưa xác định',
         })
         session['lichkham_duoc_chon'] = list_lichkham_duoc_chon
-    return redirect('/dsk_yta')
 
+        print(session['lichkham_duoc_chon'])
+    return redirect('/dsk_yta')
 
 
 @app.route('/themngaykham', methods=["post"])
@@ -360,6 +364,26 @@ def thanhtoan():
     return render_template('thanhtoan.html')
 
 
+@app.route('/api/comments', methods=['post'])
+def add_comment():
+    content = request.json.get('content')
+    print(f"Received content: {content}")  # Debug log
+    try:
+        c = dao.add_comment(content=content)
+        return {
+            'content': c.content,
+            'created_date': c.created_date.strftime("%Y-%m-%d %H:%M:%S"),
+            'user': {
+                'avatar': current_user.avatar,
+                'hoTen': current_user.hoTen
+            }
+        }, 200
+    except Exception as e:
+        print(f"Error: {e}")  # Debug lỗi
+        return {'error': str(e)}, 400
+
+
 if __name__ == '__main__':
     from clinicapp.app import admin
+
     app.run(debug=True)

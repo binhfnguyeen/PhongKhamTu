@@ -29,12 +29,12 @@
 
 <div class="row">
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card shadow h-100 py-4 border-left-primary" style="border-radius: 10px; background-color: #f8f9fc;">
+        <div class="card shadow-lg h-100 py-4 border-left-primary" style="border-radius: 15px; background-color: #ffffff;">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" style="font-size: 1.1rem;">Số Người Dùng</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.5rem; color: #4e73df;">{{ user_count }}</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.6rem; color: #93DC5C; transition: color 0.3s ease;">{{ user_count }}</div>
                     </div>
                 </div>
             </div>
@@ -42,18 +42,58 @@
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card shadow h-100 py-4 border-left-success" style="border-radius: 10px; background-color: #f8f9fc;">
+        <div class="card shadow-lg h-100 py-4 border-left-success" style="border-radius: 15px; background-color: #ffffff;">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 1.1rem;">Số Nhân Viên</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.5rem; color: #1cc88a;">{{ nhan_vien_count }}</div>
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 1.1rem;">Số Y tá</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.6rem; color: #93DC5C; transition: color 0.3s ease;">{{ y_ta_count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow-lg h-100 py-4 border-left-success" style="border-radius: 15px; background-color: #ffffff;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 1.1rem;">Số Bác sĩ</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.6rem; color: #B7E892; transition: color 0.3s ease;">{{ bac_si_count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow-lg h-100 py-4 border-left-success" style="border-radius: 15px; background-color: #ffffff;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 1.1rem;">Số Thu ngân</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.6rem; color: #DBF3C9; transition: color 0.3s ease;">{{ thu_ngan_count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow-lg h-100 py-4 border-left-success" style="border-radius: 15px; background-color: #ffffff;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 1.1rem;">Số Quản trị</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" style="font-size: 1.6rem; color: #C3F550; transition: color 0.3s ease;">{{ quan_tri_count }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="row justify-content-center">
     <div class="col-md-8 col-12 d-flex justify-content-center">
@@ -108,4 +148,48 @@
     </div>
 </form>
 {% endif %}
+
+{% block tail_js %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = ['Người Dùng', 'Y tá', 'Bác sĩ', 'Thu ngân', 'Quản trị'];
+    let chartData = [{{ user_count }}, {{ y_ta_count }}, {{ bac_si_count }}, {{ thu_ngan_count }}, {{ quan_tri_count }}];
+
+    console.log(labels)
+    console.log(chartData)
+
+    window.onload = function() {
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'User',
+                    data: chartData,
+                    borderWidth: 1,
+                    backgroundColor: ["#32CD32", "#93DC5C", "#B7E892", "#DBF3C9", "#C3F550"],  // Màu sắc cho các cột
+                    borderColor: ["#007bff", "#28a745", "#007bff", "#ffc107", "#007bff"],  // Màu viền cho các cột
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return Math.round(value);  // Chỉ hiển thị số nguyên trên trục Y
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
 {% endblock %}

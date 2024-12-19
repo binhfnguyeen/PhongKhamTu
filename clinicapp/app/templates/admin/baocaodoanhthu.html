@@ -98,13 +98,13 @@
             <td>{{ loop.index }}</td>
             <td>{{ row.ngay_kham }}</td>
             <td>{{ row.so_benh_nhan }}</td>
-            <td>{{ row.doanh_thu }}</td>
+            <td>{{ "{:,.0f}".format(row.doanh_thu) }}</td>
             <td>{{ row.tyle * 100 }}</td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
-    <h3>Tổng doanh thu: {{ tong_doanh_thu }} VNĐ</h3>
+    <h3>Tổng doanh thu: {{ "{:,.0f}".format(tong_doanh_thu) }} VNĐ</h3>
 
     <div class="row justify-content-center">
         <div class="col-md-8 col-12 d-flex justify-content-center">
@@ -113,4 +113,47 @@
     </div>
     {% endif %}
 </div>
+
+{% block tail_js %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = [];
+    let chartData = [];
+
+    {% for row in report_data %}
+        labels.push("{{ row.ngay_kham }}");
+        chartData.push("{{ row.doanh_thu }}");
+    {% endfor  %}
+
+    console.log(labels)
+    console.log(chartData)
+
+    window.onload = function() {
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu theo ngày',
+                    data: chartData,
+                    borderWidth: 2,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
 {% endblock %}

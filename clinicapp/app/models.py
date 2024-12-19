@@ -1,9 +1,13 @@
 from datetime import date
 
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE, Enum
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE, Enum, DateTime
 from enum import Enum as DonViEnum
+
+from sqlalchemy.orm import relationship
+
 from clinicapp.app import app, db
 from flask_login import UserMixin
+from datetime import datetime
 
 
 class NguoiDung(db.Model):
@@ -29,10 +33,19 @@ class BenhNhan(NguoiDung, UserMixin):
         return (self.idBenhNhan)
 
 
+class Comment(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(String(255), nullable=False)
+    user_id = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
+    created_date = Column(DateTime, default=datetime.now())
+
+    user = relationship('BenhNhan', backref='comments', lazy=True)
+
+
 class NhanVien(NguoiDung, UserMixin):
     __table_args__ = {"extend_existing": True}
     idNhanVien = Column(Integer, primary_key=True, autoincrement=True)
-    bangCap = Column(String(50))
+    bangCap = Column(String(50), default="Cử Nhân")
     ngayVaoLam = Column(DATE)
 
     def get_id(self):
@@ -133,6 +146,7 @@ if __name__ == '__main__':
         db.create_all()
 
         import hashlib
+
 
         # yta = YTa(
         #     bangCap="Trung cấp Y tế",

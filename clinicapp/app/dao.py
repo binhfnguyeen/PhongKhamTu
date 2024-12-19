@@ -1,6 +1,9 @@
 from datetime import datetime
+
+from flask_login import current_user
 from sqlalchemy import func
-from models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, HoaDon, Thuoc, ChiTietDonThuoc, PhieuKham
+from models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, HoaDon, Thuoc, ChiTietDonThuoc, \
+    PhieuKham, Comment
 from clinicapp.app import db, app
 import hashlib
 import cloudinary.uploader
@@ -45,6 +48,8 @@ def auth_user(username, password, role):
     }
 
     model = model_map.get(role)
+    print(model)
+
     if model:
         return model.query.filter(model.username == username.strip(), model.password == password_hashed).first()
     return None
@@ -255,13 +260,13 @@ def thong_ke_theo_ngay(month, year):
 
         report.append({
             'ngay_kham': ngay_kham,
-            'doanh_thu': f"{doanh_thu:,.0f}",
+            'doanh_thu': doanh_thu,
             'so_benh_nhan': so_benh_nhan,
             'tyle': round(ty_le, 2),
         })
 
     report.sort(key=lambda x: x['ngay_kham'])
-    return report, f"{tong_doanh_thu:,.0f}"
+    return report, tong_doanh_thu
 
 
 def thong_ke_su_dung_thuoc_theo_ngay(month, year):
@@ -299,3 +304,18 @@ def thong_ke_su_dung_thuoc_theo_ngay(month, year):
     except Exception as e:
         print(f"Lỗi khi thống kê sử dụng thuốc: {e}")
         return {"status": "error", "message": str(e)}
+
+
+def add_comment(content):
+    if not current_user.is_authenticated:
+        raise ValueError("User must be authenticated to comment")
+
+    c = Comment(content=content, user_id=current_user.idBenhNhan)
+
+    db.session.add(c)
+    db.session.commit()
+    return c
+
+
+def load_comment():
+    return Comment.query.all()

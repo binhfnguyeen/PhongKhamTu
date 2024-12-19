@@ -404,7 +404,6 @@
 <script src="{{ admin_static.url(filename='vendor/multi-level-dropdowns-bootstrap/bootstrap4-dropdown-ml-hack.js') }}"
         type="text/javascript"></script>
 <script src="{{ admin_static.url(filename='admin/js/helpers.js', v='1.0.0') }}" type="text/javascript"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#sidebarCollapse').on('click', function () {
@@ -437,37 +436,6 @@
             }, 2000);
         }
     });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = new bootstrap.Modal(document.getElementById('welcomeModal'));
-        modal.show();
-    });
-
-    window.onload = function() {
-    const ctx = document.getElementById('myChart');
-
-    new Chart(ctx, {
-            type: 'line',  // Thay 'bar' thành 'line'
-            data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    borderWidth: 2,  // Đặt độ dày đường vẽ
-                    borderColor: 'rgba(75, 192, 192, 1)',  // Màu của đường
-                    fill: false,  // Không tô màu nền dưới đường
-                    tension: 0.1  // Độ cong của đường, có thể điều chỉnh
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
 </script>
 
 {% if admin_view.extra_js %}

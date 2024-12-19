@@ -112,4 +112,47 @@
     </div>
     {% endif %}
 </div>
+
+{% block tail_js %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = [];
+    let chartData = [];
+
+    {% for row in report_data %}
+        labels.push("{{ row.ten_thuoc }}");
+        chartData.push(parseInt({{ row.so_lan_dung }}));
+    {% endfor  %}
+
+    console.log(labels)
+    console.log(chartData)
+
+    window.onload = function() {
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sử dụng thuốc theo ngày',
+                    data: chartData,
+                    borderWidth: 2,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
 {% endblock %}

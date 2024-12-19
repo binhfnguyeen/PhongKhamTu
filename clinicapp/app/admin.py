@@ -1,3 +1,5 @@
+import hashlib
+import logging
 from flask import request
 from flask_admin import AdminIndexView, Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
@@ -14,16 +16,35 @@ class MyAdminIndexView(AdminIndexView):
     def index(self):
         user_count = BenhNhan.query.count()
         nhan_vien_count = NhanVien.query.count()
+        y_ta_count = YTa.query.count()
+        bac_si_count = BacSi.query.count()
+        thu_ngan_count = ThuNgan.query.count()
+        quan_tri_count = QuanTri.query.count()
 
-        return self.render('admin/index.html', user_count=user_count, nhan_vien_count=nhan_vien_count)
+        return self.render('admin/index.html',
+                           user_count=user_count, y_ta_count=y_ta_count,
+                           bac_si_count=bac_si_count, thu_ngan_count=thu_ngan_count, quan_tri_count=quan_tri_count)
 
 
 admin = Admin(app=app, name="Clinic Admin", template_mode="bootstrap4", index_view=MyAdminIndexView())
 
 
+def hash_password(password):
+    return hashlib.md5(password.strip().encode('utf-8')).hexdigest()
+
+
 class AdminView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.idQuanTri
+
+    def on_model_change(self, form, model, is_created):
+        if form.gioiTinh.data is False:
+            form.gioiTinh.data = False
+        if form.gioiTinh.data is True:
+            form.gioiTinh.data = True
+        if form.password.data:
+            model.password = hash_password(form.password.data)
+        return super().on_model_change(form, model, is_created)
 
 
 class ThuocView(AdminView):
@@ -63,6 +84,14 @@ class ThuocView(AdminView):
     }
 
 
+def coerce_gender(value):
+    if value == 'True':
+        return True
+    elif value == 'False':
+        return False
+    return None
+
+
 class YTaView(AdminView):
     can_edit = True
     can_create = True
@@ -73,6 +102,13 @@ class YTaView(AdminView):
     column_searchable_list = ['hoTen']
     column_filters = ['idYTa', 'gioiTinh']
     column_list = ['idYTa', 'hoTen', 'username', 'password', 'sdt', 'gioiTinh', 'ngaySinh', 'diaChi']
+
+    column_choices = {
+        'gioiTinh': [
+            ('Name', True),
+            ('Nữ', False),
+        ]
+    }
 
     column_formatters = {
         'gioiTinh': lambda v, c, m, p: 'Nam' if m.gioiTinh else 'Nữ'
@@ -89,30 +125,15 @@ class YTaView(AdminView):
         'diaChi': 'Địa chỉ'
     }
 
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            if model.gioiTinh is None:
-                model.gioiTinh = True  # Default to 'Nam'
-        return super().on_model_change(form, model, is_created)
-
     form_extra_fields = {
         'gioiTinh': SelectField(
             'Giới tính',
             choices=[(True, 'Nam'), (False, 'Nữ')],
-            default=True
+            coerce=coerce_gender,
+            default=None,
+            widget=Select2Widget()
         )
     }
-
-    form_widget_args = {
-        'gioiTinh': {
-            'widget': Select2Widget()
-        }
-    }
-
-    def get_search_form(self):
-        form = super(YTaView, self).get_search_form()
-        form.gioiTinh.choices = [(True, 'Nam'), (False, 'Nữ')]  # Custom filter choices
-        return form
 
 
 class BacSiView(AdminView):
@@ -120,7 +141,18 @@ class BacSiView(AdminView):
     can_create = True
     can_delete = True
     column_display_pk = True
+    can_view_details = True
+    can_export = True
+    column_searchable_list = ['hoTen']
+    column_filters = ['idBacSi', 'gioiTinh']
     column_list = ['idBacSi', 'hoTen', 'chuyenKhoa', 'username', 'password', 'sdt', 'gioiTinh', 'ngaySinh', 'diaChi']
+
+    column_choices = {
+        'gioiTinh': [
+            (True, 'Nam'),
+            (False, 'Nữ'),
+        ]
+    }
 
     column_formatters = {
         'gioiTinh': lambda v, c, m, p: 'Nam' if m.gioiTinh else 'Nữ'
@@ -138,12 +170,26 @@ class BacSiView(AdminView):
         'diaChi': 'Địa chỉ'
     }
 
+    form_extra_fields = {
+        'gioiTinh': SelectField(
+            'Giới tính',
+            choices=[(True, 'Nam'), (False, 'Nữ')],
+            coerce=coerce_gender,  # Dùng hàm coerce để chuyển đổi giá trị
+            default=None,  # Đặt giá trị mặc định là None để tránh lỗi khi không có lựa chọn
+            widget=Select2Widget()
+        )
+    }
+
 
 class ThuNganView(AdminView):
     can_edit = True
     can_create = True
     can_delete = True
     column_display_pk = True
+    can_view_details = True
+    can_export = True
+    column_searchable_list = ['hoTen']
+    column_filters = ['idThuNgan', 'gioiTinh']
     column_list = ['idThuNgan', 'hoTen', 'username', 'password', 'sdt', 'gioiTinh', 'ngaySinh', 'diaChi']
 
     column_formatters = {
@@ -161,12 +207,26 @@ class ThuNganView(AdminView):
         'diaChi': 'Địa chỉ'
     }
 
+    form_extra_fields = {
+        'gioiTinh': SelectField(
+            'Giới tính',
+            choices=[(True, 'Nam'), (False, 'Nữ')],
+            coerce=coerce_gender,  # Dùng hàm coerce để chuyển đổi giá trị
+            default=None,  # Đặt giá trị mặc định là None để tránh lỗi khi không có lựa chọn
+            widget=Select2Widget()
+        )
+    }
+
 
 class QuanTriView(AdminView):
     can_edit = True
     can_create = True
     can_delete = True
     column_display_pk = True
+    can_view_details = True
+    can_export = True
+    column_searchable_list = ['hoTen']
+    column_filters = ['idQuanTri', 'gioiTinh']
     column_list = ['idQuanTri', 'hoTen', 'username', 'password', 'sdt', 'gioiTinh', 'ngaySinh', 'diaChi']
 
     column_formatters = {
@@ -182,6 +242,16 @@ class QuanTriView(AdminView):
         'ngaySinh': 'Ngày Sinh',
         'sdt': 'Số điện thoại',
         'diaChi': 'Địa chỉ'
+    }
+
+    form_extra_fields = {
+        'gioiTinh': SelectField(
+            'Giới tính',
+            choices=[(True, 'Nam'), (False, 'Nữ')],
+            coerce=coerce_gender,  # Dùng hàm coerce để chuyển đổi giá trị
+            default=None,  # Đặt giá trị mặc định là None để tránh lỗi khi không có lựa chọn
+            widget=Select2Widget()
+        )
     }
 
 
