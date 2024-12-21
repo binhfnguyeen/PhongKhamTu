@@ -284,69 +284,99 @@ def dsk_yta():
         return redirect('/')
 
 
-@app.route('/chonlichkham', methods=['POST'])
+@app.route('/api/chonlichkham', methods=['POST'])
 def choose_appointment():
-    lichkham_id = request.form.get('lichkham_id')
-    lichkham_duoc_chon = dao.get_lichkham(lichkham_id=lichkham_id)
-    user_info = dao.get_user(lichkham_duoc_chon.id_benhnhan)
-
-    list_lichkham_duoc_chon = session.get('lichkham_duoc_chon', [])
-    list_lichkham_duoc_chon_ids = [lk['idLichKham'] for lk in list_lichkham_duoc_chon]
-
-    if len(list_lichkham_duoc_chon) >= 40:
-        flash('Danh sách bệnh nhân đã đạt tối đa 40 người.', 'danger')
-        return redirect('/dsk_yta')
-
-    if lichkham_duoc_chon.idLichKham not in list_lichkham_duoc_chon_ids:
-        list_lichkham_duoc_chon.append({
-            'idLichKham': lichkham_duoc_chon.idLichKham,
-            'idBenhNhan': user_info.idBenhNhan,
-            'hoTen': user_info.hoTen,
-            'gioiTinh': "Nam" if user_info.gioiTinh else "Nữ",
-            'ngaySinh': user_info.ngaySinh.strftime('%d/%m/%Y'),
-            'diaChi': user_info.diaChi,
-            'ngayDangKy': lichkham_duoc_chon.ngayDangKy.strftime('%d/%m/%Y'),
-            'ngayKham': lichkham_duoc_chon.ngayKham.strftime(
-                '%d/%m/%Y') if lichkham_duoc_chon.ngayKham else 'Chưa xác định',
-        })
-        session['lichkham_duoc_chon'] = list_lichkham_duoc_chon
-
-        print(session['lichkham_duoc_chon'])
-    return redirect('/dsk_yta')
-
-
-@app.route('/themngaykham', methods=["post"])
-def update_ngaykham():
-    print("Request Form Data:", request.form)
-    lichkham_id = request.form.get('lichkham_id')
-    ngayKham = request.form.get('ngayKham')
-    ngaykham_format = datetime.strptime(ngayKham, '%Y-%m-%d').date()
-
-    print(f"lichkham_id: {lichkham_id}, ngayKham: {ngayKham}")
-    yta = dao.get_current_yta_by_id(current_user.idYTa)
-
-    lichkham_duoc_chon = session.get('lichkham_duoc_chon', [])
-
-    for lich in lichkham_duoc_chon:
-        if lich['idLichKham'] == lichkham_id:
-            lich['ngayKham'] = ngaykham_format
-
     try:
-        dao.yta_update_lichkham(lichkham_id=lichkham_id, ngayKham=ngaykham_format, yta_id=yta.idYTa)
-        flash('Ngày khám đã được cập nhật thành công!', 'success')
+        data = request.get_json()
+        lichkham_id = data.get('lichkham_id')
+
+        if not lichkham_id:
+            return jsonify({'error': 'Thiếu lichkham_id'}), 400
+
+        lichkham_duoc_chon = dao.get_lichkham(lichkham_id=lichkham_id)
+        if not lichkham_duoc_chon:
+            return jsonify({'error': 'Lịch khám không tồn tại'}), 404
+
+        user_info = dao.get_user(lichkham_duoc_chon.id_benhnhan)
+        if not user_info:
+            return jsonify({'error': 'Bệnh nhân không tồn tại'}), 404
+
+        list_lichkham_duoc_chon = session.get('lichkham_duoc_chon', [])
+        list_lichkham_duoc_chon_ids = [lk['idLichKham'] for lk in list_lichkham_duoc_chon]
+
+        if len(list_lichkham_duoc_chon) >= 40:
+            return jsonify({'error': 'Danh sách bệnh nhân đã đạt tối đa 40 người.'}), 400
+
+        if lichkham_duoc_chon.idLichKham not in list_lichkham_duoc_chon_ids:
+            list_lichkham_duoc_chon.append({
+                'idLichKham': lichkham_duoc_chon.idLichKham,
+                'idBenhNhan': user_info.idBenhNhan,
+                'hoTen': user_info.hoTen,
+                'gioiTinh': "Nam" if user_info.gioiTinh else "Nữ",
+                'ngaySinh': user_info.ngaySinh.strftime('%d/%m/%Y'),
+                'diaChi': user_info.diaChi,
+                'ngayDangKy': lichkham_duoc_chon.ngayDangKy.strftime('%d/%m/%Y'),
+                'ngayKham': lichkham_duoc_chon.ngayKham.strftime(
+                    '%d/%m/%Y') if lichkham_duoc_chon.ngayKham else 'Chưa xác định',
+            })
+            session['lichkham_duoc_chon'] = list_lichkham_duoc_chon
+
+            print(session['lichkham_duoc_chon'])
+        return jsonify({'success': True, 'lichkham_duoc_chon': session['lichkham_duoc_chon']})
+
     except Exception as e:
-        flash(f'Có lỗi xảy ra khi cập nhật ngày khám: {e}', 'danger')
-
-    return redirect('/dsk_yta')
+        return jsonify({'error': str(e)}), 500
 
 
-@app.route('/xoalichkham', methods=['POST'])
+@app.route('/api/themngaykham', methods=["post"])
+def update_ngaykham():
+    try:
+        data = request.get_json()
+        lichkham_id = data.get('lichkham_id')
+        ngayKham = data.get('ngayKham')
+
+        if not lichkham_id or not ngayKham:
+            return jsonify({'success': False, 'message': 'Thiếu thông tin.'}), 400
+
+        ngaykham_format = datetime.strptime(ngayKham, '%Y-%m-%d').date()
+
+        yta = dao.get_current_yta_by_id(current_user.idYTa)
+        dao.yta_update_lichkham(lichkham_id=lichkham_id, ngayKham=ngaykham_format, yta_id=yta.idYTa)
+
+        return jsonify({
+            'success': True,
+            'message': 'Ngày khám đã được cập nhật thành công!',
+            'ngayKham': ngaykham_format.strftime('%d/%m/%Y')
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Có lỗi xảy ra: {str(e)}'}), 500
+
+
+@app.route('/api/xoalichkham', methods=['POST'])
 def delete_appointment():
-    lichkham_id = int(request.form.get('lichkham_id'))
+    lichkham_id = int(request.json.get('lichkham_id'))
+
     list_lichkham_duoc_chon = session.get('lichkham_duoc_chon', [])
+
     list_lichkham_duoc_chon = [lich for lich in list_lichkham_duoc_chon if lich['idLichKham'] != lichkham_id]
     session['lichkham_duoc_chon'] = list_lichkham_duoc_chon
-    return redirect('/dsk_yta')
+
+    print(session['lichkham_duoc_chon'])
+    return jsonify({"success": True, "message": "Xóa lịch khám thành công!"})
+
+
+@app.route('/api/xoahetlichkham', methods=['POST'])
+def delete_all_appointments():
+    list_lichkham_duoc_chon = session.get('lichkham_duoc_chon', [])
+
+    if not list_lichkham_duoc_chon:
+        return jsonify({"success": False, "message": "Không có lịch khám nào để xóa!"})
+
+    session['lichkham_duoc_chon'] = []
+
+    print(session['lichkham_duoc_chon'])
+    return jsonify({"success": True, "message": "Xóa tất cả lịch khám thành công!"})
 
 
 @app.route('/lapphieukham')
