@@ -246,7 +246,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block js %}
 <script>
     function chonLichKham(lichkham_id) {
         fetch(`/api/chonlichkham`, {
@@ -369,6 +371,7 @@
                 selectedRows.forEach(row => {
                     row.remove();
                 });
+                location.reload();
                 alert(data.message);
             } else {
                 alert("Không thể xóa các lịch khám.");
@@ -404,11 +407,7 @@
             alert("Không có dữ liệu để xuất PDF.");
         }
     }
-</script>
-{% endblock %}
 
-{% block js %}
-<script>
     document.getElementById("show_danhsach_kham").addEventListener("click", function() {
         document.getElementById("danh_sach_kham").style.display = "block";
         document.getElementById("show_danhsach_kham").style.display = "none";
