@@ -82,7 +82,7 @@
     {% if month and year %}
     <h2 class="report-header">BÁO CÁO SỬ DỤNG THUỐC THEO THÁNG</h2>
     <h3 class="report-header">Tháng {{ month }} Năm {{ year }}</h3>
-    <table class="table table-bordered table-striped">
+    <table id="bao_cao_thuoc" class="table table-bordered table-striped">
         <thead>
         <tr>
             <th>STT</th>
@@ -109,6 +109,12 @@
         <div class="col-md-8 col-12 d-flex justify-content-center">
             <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
         </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-start mt-3">
+        <button type="button" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                id="xuat_pdf" onclick="xuatPDF()">
+            <i class="bi bi-file-earmark-pdf me-2"></i> Xuất PDF
+        </button>
     </div>
     {% endif %}
 </div>
@@ -152,6 +158,45 @@
                 }
             }
         });
+    }
+
+    function xuatPDF() {
+        const table = document.querySelector("#bao_cao_thuoc");
+        if (table) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Báo cáo sử dụng thuốc", 14, 15);
+
+            const monthYear = document.querySelector(".report-header:nth-child(2)").textContent.trim();
+            doc.setFontSize(12);
+            doc.text(monthYear, 14, 25);
+
+            doc.autoTable({
+                html: "#bao_cao_thuoc",
+                startY: 30,
+                theme: 'grid',
+                styles: {
+                    font: "Helvetica",
+                    fontSize: 10,
+                    cellPadding: 4,
+                },
+                headStyles: {
+                    fillColor: [220, 220, 220],
+                    textColor: [0, 0, 0],
+                    halign: 'center',
+                },
+                bodyStyles: {
+                    halign: 'center',
+                },
+            });
+
+            doc.save("bao_cao_su_dung_thuoc.pdf");
+        } else {
+            alert("Không có dữ liệu để xuất PDF.");
+        }
     }
 </script>
 {% endblock %}

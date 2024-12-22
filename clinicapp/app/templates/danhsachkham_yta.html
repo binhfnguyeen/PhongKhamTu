@@ -390,9 +390,9 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            doc.addFileToVFS("NotoSans-Regular.ttf", "static/font/encoded-20241221090528.txt");
-            doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
-            doc.setFont("NotoSans");
+            doc.addFileToVFS("Roboto-Regular.ttf", "encoded-20241221153957.txt");
+            doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+            doc.setFont("Roboto");
 
             doc.text("Danh sách khám bệnh", 14, 10);
             doc.autoTable({
