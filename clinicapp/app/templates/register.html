@@ -1,23 +1,31 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-
-{% if err_msg %}
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">
-          {{ err_msg }}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div aria-live="polite" aria-atomic="true" class="position-relative">
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+                {% for category, message in messages %}
+                    <div class="toast align-items-center text-bg-{{ category if category != 'danger' else 'danger' }} border-0 mb-2"
+                         role="alert"
+                         aria-live="assertive"
+                         aria-atomic="true"
+                         data-bs-delay="3000"
+                         data-bs-autohide="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
+    {% endif %}
+{% endwith %}
 
-<form method="post" action="/register" enctype="multipart/form-data" class="vh-100 gradient-custom">
+<form method="post" action="/register" enctype="multipart/form-data" class="vh-100 gradient-custom mb-5">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-6 col-lg-5 col-xl-4">
@@ -74,4 +82,13 @@
 
 {% block js %}
 <script src="{{ url_for('static', filename='js/style.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toastElements = document.querySelectorAll('.toast');
+        toastElements.forEach(function (toastElement) {
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        });
+    });
+</script>
 {% endblock %}

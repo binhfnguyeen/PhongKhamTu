@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <div class="container">
+        <div class="row align-items-center justify-content-around thongtin" style="padding: 2rem;">
+            <div class="col-md-7">
+                <div class="row">
+                    <div class="col-md-8">Bác sĩ: <b>{{current_user.hoTen}}</b></div>
+                    <div class="col-6 col-md-4"><b> ID nhân viên: {{ current_user.idBacSi }}</b></div>
+                </div>
+
+                <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                <div class="row">
+                    <div class="col-6 col-md-4">Năm sinh: {{current_user.ngaySinh}}</div>
+                    <div class="col-6 col-md-4">Giới tính: {{'Nam' if current_user.gioiTinh else 'Nữ'}}</div>
+                    <div class="col-6 col-md-4">Chuyên Khoa: {{current_user.chuyenKhoa}}</div>
+                </div>
+
+                <!-- Columns are always 50% wide, on mobile and desktop -->
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-6"></div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <img class="img-responsive"
+                     src="{{current_user.avatar}}"
+                     alt="Chania" width="120" height="160">
+            </div>
+        </div>
+    </div>
+</div>

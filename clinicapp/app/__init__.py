@@ -6,9 +6,10 @@ from flask_login import LoginManager
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://heulwen:%s@localhost/benhvientu?charset=utf8mb4" % quote('Nguyennguyen123@')
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@127.0.0.1:3306/benhvientu?charset=utf8mb4" % quote('minhtri123')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config["SECRET_KEY"] = "mInHtRiBnGuYeNTnGuYeN"
+app.config["PAGE_SIZE_THUOC"] = 10
 
 db = SQLAlchemy(app)
 login = LoginManager(app)

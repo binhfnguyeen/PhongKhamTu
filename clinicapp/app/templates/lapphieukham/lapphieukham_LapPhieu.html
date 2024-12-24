@@ -1,0 +1,846 @@
+{% extends 'lapphieukham.html' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        {% for category, message in messages %}
+        <div class="toast align-items-center text-bg-{{ category if category != 'danger' else 'danger' }} border-0 mb-2"
+             role="alert"
+             aria-live="assertive"
+             aria-atomic="true"
+             data-bs-delay="3000"
+             data-bs-autohide="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
+{% include 'lapphieukham/thongtinbacsi.html' %}
+
+{% if benhnhan %}
+
+<div>
+    <div id="hosobenhnhan" class="hosobenhnhan">
+        <h2 class="text-center " style="padding: 2rem">HỒ SƠ BỆNH NHÂN</h2>
+        <!--thong tin benh nhan-->
+        <button id="toggleButton" onclick="toggleSidebar()">xem hồ sơ bệnh nhân</button>
+        <div class="container">
+            {% if hosobenhnhan %}
+            <div class="row align-items-center justify-content-around thongtin" style="padding: 1rem;">
+                <h4>Thông tin</h4>
+                <div class="col-md-7">
+                    <div class="row">
+                        <div class="col-md-8">Họ và tên: <b>{{ hosobenhnhan.hoTen }}</b></div>
+                        <div class="col-6 col-md-4"><b>ID Bệnh nhân: {{ hosobenhnhan.idBenhNhan }}</b></div>
+                    </div>
+                    <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                    <div class="row">
+                        <div class="col-6 col-md-4">Năm sinh: {{ hosobenhnhan.ngaySinh }}
+                        </div>
+                        <div class="col-6 col-md-4">Giới tính: {{'Nam' if hosobenhnhan.gioiTinh else 'Nữ'
+                            }}
+                        </div>
+                        <div class="col-6 col-md-4">Hồ sơ số: <b>{{ hosobenhnhan.idHoSo }}</b></div>
+                    </div>
+
+                    <!-- Columns are always 50% wide, on mobile and desktop -->
+                    <div class="row">
+                        <div class="col-8">Địa chỉ: {{ hosobenhnhan.diaChi }}</div>
+                        <div class="col-4">Tình trạng: {{ hosobenhnhan.tinhTrang }}</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <img class="img-responsive"
+                         src="{{ hosobenhnhan.avatar }}"
+                         alt="Chania" width="120" height="160">
+                </div>
+            </div>
+            <div class="container" style="padding: 1rem; background: darkgray">
+                <h4 class="text-center" style="padding: 1rem">LỊCH SỬ KHÁM BỆNH</h4>
+                <div style="padding: 1rem;">
+                    <input class="form-control" id="searchHistory" type="text" placeholder="Search.."
+                           style="width: 50%">
+                </div>
+                {% if lichSuKhamBenh %}
+                <table class="table text-centre table-striped" id="History">
+                    <thead>
+                    <tr>
+                        <th style="width: 10%">Ngày</th>
+                        <th>Thông tin phiếu khám</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for phieuKham in lichSuKhamBenh %}
+                    <tr style="background: aliceblue; padding: 1rem;">
+                        <td>{{ phieuKham.ngayTao }}</td>
+                        <td style="background: unset;">
+                            <div class="container">
+                                <div class="container">
+                                    <div class="row align-items-center justify-content-around thongtin"
+                                         style="padding: 1rem;">
+                                        <div class="col-md-8">
+                                            <div class="row">
+                                                <div class="col-md-8">Bác sĩ: <b>{{ phieuKham.hoTen }}</b></div>
+                                                <div class="col-6 col-md-4"><b>ID Nhân Viên: {{ phieuKham.id_bacsi
+                                                    }}</b></div>
+                                            </div>
+
+                                            <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                                            <div class="row">
+                                                <div class="col-6 col-md-4">Năm sinh: {{
+                                                    phieuKham.ngaySinh }}
+                                                </div>
+                                                <div class="col-6 col-md-4">Giới tính: {{phieuKham.gioiTinh }}
+                                                </div>
+                                                <div class="col-6 col-md-4">Chuyên Khoa: {{ phieuKham.chuyenKhoa }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Columns are always 50% wide, on mobile and desktop -->
+                                            <div class="row">
+                                                <div class="col-6"></div>
+                                                <div class="col-6"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <img class="img-responsive"
+                                                 src="{{ phieuKham.avatar }}"
+                                                 alt="Chania" width="120" height="160">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container">
+                                    <div class=" flex-row-2 d-flex justify-content-around container">
+                                        <div class="container">
+                                            <h4 class="text-center" style="padding: 0.5rem;">Thông tin chẩn đoán</h4>
+                                            <div class="d-flex justify-content-around">
+                                                <div>
+                                                    <div class="" style="width: 21rem">
+                                                        <label for="" class="form-label fw-bold">Triệu
+                                                            chứng</label>
+                                                        <textarea class="form-control" placeholder="Nhập triệu chứng"
+                                                                  id=""
+                                                                  style="max-height: 4.8rem"
+                                                                  readonly>{{ phieuKham.trieuChung }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="" style="width: 21rem">
+                                                    <label for="" class="form-label fw-bold">Chẩn đoán</label>
+                                                    <textarea class="form-control" placeholder="Nhập chẩn đoán"
+                                                              style="max-height: 4.8rem"
+                                                              readonly>{{ phieuKham.chanDoan }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container">
+                                        <h4 class="text-center" style="padding: 0.5rem;">Toa thuốc</h4>
+                                        {% if phieuKham.donThuoc %}
+                                        <div class="container mt-4">
+                                            <!-- Prescription Table -->
+                                            <table class="table table-hover align-middle">
+                                                <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 5%;">STT</th>
+                                                    <th style="width: 30%;">Tên Thuốc</th>
+                                                    <th style="width: 13%;">Đơn Vị</th>
+                                                    <th style="width: 13%;">Số Lượng</th>
+                                                    <th style="width: 30%;">Cách Dùng</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <!-- Row 1 -->
+                                                {% for thuoc in phieuKham['donThuoc'] %}
+                                                <tr>
+                                                    <td>{{ thuoc.stt }}</td>
+                                                    <td>
+                                                        {{ thuoc.tenThuoc }}
+                                                    </td>
+                                                    <td>
+                                                        {{ thuoc.loaiThuoc }}
+                                                    </td>
+                                                    <td>
+                                                        {{ thuoc.soLuongThuoc }}
+                                                    </td>
+                                                    <td>
+                                                        {{ thuoc.huongDanSuDung }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        {% else %}
+                                        <h4 class="text-center" style="padding: 1rem">PHIẾU KHÁM NÀY KHÔNG CÓ ĐƠN
+                                            THUỐC</h4>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <h4 class="text-center" style="padding: 1rem">BỆNH NHÂN CHƯA CÓ PHIẾU KHÁM NÀO</h4>
+                {% endif %}
+            </div>
+            {% else %}
+            <h2 class="text-center " style="padding: 2rem">HỒ SƠ BỆNH NHÂN TRỐNG</h2>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div class=" container shadow" style="background: aliceblue;">
+    <h2 class="text-center" style="padding-top: 2rem;">PHIẾU KHÁM</h2>
+    <div class="container">
+        <div class="row align-items-center justify-content-around thongtin" style="padding: 1rem;">
+            <h4>Thông tin bệnh nhân</h4>
+            <div class="col-md-7">
+                <div class="row">
+                    <div class="col-md-8">Họ và tên: <b>{{ benhnhan.hoTen }}</b></div>
+                    <div id="idBenhNhan" class="col-6 col-md-4">ID Bệnh nhân: <b> {{ benhnhan.idBenhNhan }} </b></div>
+                </div>
+                <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                <div class="row">
+                    <div class="col-6 col-md-4">Năm sinh: {{ benhnhan.ngaySinh }}</div>
+                    <div class="col-6 col-md-4">Giới tính: {{'Nam' if benhnhan.gioiTinh else 'Nữ'}}</div>
+                    <div class="col-6 col-md-4"></div>
+                </div>
+
+                <!-- Columns are always 50% wide, on mobile and desktop -->
+                <div class="row">
+                    <div class="col-8">Địa chỉ: {{ benhnhan.diaChi }}</div>
+                    <div class="col-2"></div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <img class="img-responsive"
+                     src="{{ benhnhan.avatar }}"
+                     alt="Chania" width="120" height="160">
+            </div>
+
+            <div class="col-md-2 align-self-end">
+                <button type="button" class="btn btn-danger"><a
+                        class="link-light link-offset-2 link-underline link-underline-opacity-0" href="/lichkham">Đổi
+                    Bệnh nhân</a></button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class=" flex-row-2 d-flex justify-content-around container">
+        <div class="container chandoan">
+            <h4 class="text-center" style="margin-bottom: 1.5rem;">Thông tin chẩn đoán</h4>
+            <div>
+                <form>
+                    <div class="mb-3">
+                        <label for="iddateChanDoan" class="form-label fw-bold">Ngày chẩn khám</label>
+                        <div class="input-group" style="width: 20rem">
+                            <span class="input-group-text"></span>
+                            <input type="date" id="iddateChanDoan" class="form-control">
+                        </div>
+                    </div>
+                </form>
+                <div class="mb-3">
+                    <label for="trieuchungInput" class="form-label fw-bold">Triệu chứng</label>
+                    <div class="form-floating">
+                                <textarea class="form-control" placeholder="Nhập triệu chứng" id="trieuchungInput"
+                                          style="height: 4.8rem"></textarea>
+                        <label for="trieuchungInput">Nhập triệu chứng...</label>
+                    </div>
+                </div>
+                <form>
+                    <div class="mb-3">
+                        <label for="chandoanInput" class="form-label fw-bold">Chẩn đoán</label>
+                        <div class="form-floating">
+                                <textarea class="form-control" placeholder="Nhập triệu chứng" id="chandoanInput"
+                                          style="height: 4.8rem"></textarea>
+                            <label for="chandoanInput">Nhập chẩn đoán...</label>
+                        </div>
+                    </div>
+                </form>
+<!--                <div class="mb-3">-->
+<!--                    <label for="loiKhuyenInput" class="form-label fw-bold">Lời Khuyên</label>-->
+<!--                    <div class="form-floating">-->
+<!--                                <textarea class="form-control" placeholder="Nhập triệu chứng" id="loiKhuyenInput"-->
+<!--                                          style="height: 4.8rem"></textarea>-->
+<!--                        <label for="chandoanInput">Lời khuyên của bác sĩ</label>-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+        </div>
+        <div class="container">
+            <h4 class="text-center">Toa thuốc</h4>
+            <div class="container mt-4">
+                <!-- Search Input -->
+                <div class="mb-3 text-end">
+                    <input id="searchThuoc" type="text" class="form-control d-inline-block w-50"
+                           placeholder="Nhập tên thuốc" onfocus="">
+                </div>
+                <!-- Prescription Table -->
+                <table class="table text-center table-hover align-middle" id="donThuoc">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 5%;">STT</th>
+                        <th style="width: 30%;">Tên Thuốc</th>
+                        <th style="width: 13%;">Đơn Vị</th>
+                        <th style="width: 13%;">Số Lượng</th>
+                        <th style="width: 30%;">Cách Dùng</th>
+                        <th style="width: 10%;"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <!-- Add Button -->
+                <div class="text-center my-3">
+                    <button class="btn btn-primary" id="themThuoc" onclick="addMedicationRow()">
+                        <i class="fa fa-plus"></i> Thêm Thuốc
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="d-grid gap-2 d-md-block" style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+<!--    <button id="luuNhapPhieuKham" type="" class="btn btn-secondary">Lưu Nháp-->
+<!--    </button>-->
+    <button id="xuatPhieuKham" onclick="exportMedicalRecord()" class="btn btn-success">Xuất phiếu khám
+    </button>
+</div>
+{% else %}
+<h2>Chưa có bệnh nhân được chọn</h2>
+{% endif %}
+{% endblock %}
+
+
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+<script>
+    $(document).ready(function () { // Giới hạn số mục hiển thị
+
+        $(document).on("keyup click", "#searchHistory", function () {
+            var value = $(this).val().toLowerCase();
+            var historyTable = $("#History"); // Bảng lịch sử khám
+            var rows = historyTable.find("tbody tr"); // Lấy tất cả các hàng trong bảng
+
+            // Lọc các hàng trong bảng theo từ khóa tìm kiếm
+            var visibleRows = rows.filter(function () {
+                var text = $(this).text().toLowerCase(); // Tìm kiếm trong văn bản của hàng
+                var isVisible = text.indexOf(value) > -1; // Kiểm tra xem có chứa từ khóa không
+                $(this).toggle(isVisible); // Ẩn hoặc hiển thị hàng dựa trên kết quả tìm kiếm
+                return isVisible;
+            });
+
+            // Ẩn các mục vượt quá số lượng tối đa để hiển thị
+        });
+    });
+</script>
+
+<script>
+    // xử lý thuốc aanr
+    $(document).ready(function () {
+        var maxItemsToShow = 5;
+        // Xử lý sự kiện keyup và click cho ô nhập liệu tên thuốc
+        $(document).on("keyup click", ".inputTenThuoc", function () {
+            var value = $(this).val().toLowerCase();
+            var suggestionList = $(this).siblings(".suggestionThuoc");
+            var visibleItems = suggestionList.find("li").filter(function () {
+                var isVisible = $(this).text().toLowerCase().indexOf(value) > -1;
+                $(this).toggle(isVisible);
+                return isVisible; // Trả về true nếu mục nên được hiển thị
+            });
+
+            // Ẩn các mục vượt quá số lượng tối đa để hiển thị
+            if (visibleItems.length > maxItemsToShow) {
+                visibleItems.slice(maxItemsToShow).hide();
+            } else {
+                visibleItems.show(); // Hiển thị tất cả nếu không vượt quá giới hạn
+            }
+
+            // Hiển thị danh sách gợi ý nếu có mục hiển thị
+            if (visibleItems.length > 0) {
+                suggestionList.show();
+            } else {
+                suggestionList.hide();
+            }
+        });
+
+        // Ẩn gợi ý khi người dùng nhấp vào một mục
+        $(document).on("click", ".suggestionThuoc li", function () {
+            var selectedText = $(this).text();
+            var inputField = $(this).closest("tr").find(".inputTenThuoc");
+            inputField.val(selectedText); // Cập nhật ô nhập liệu với tên thuốc
+            $(".suggestionThuoc").hide(); // Ẩn danh sách gợi ý
+        });
+
+        // Ẩn danh sách gợi ý khi nhấp ra ngoài
+        $(document).on('click', function (event) {
+            if (!$(event.target).closest('.tenthuoc').length) {
+                $(".suggestionThuoc").hide();
+            }
+        });
+    });
+
+
+    //them thuoc
+    let rowCount = 1; // Initialize a counter for the rows
+    function addMedicationRow() {
+
+        const tableBody = document.querySelector('#donThuoc tbody');
+        const currentRow = tableBody.querySelector('tr:last-child'); // Lấy hàng cuối cùng
+
+        // Biến để theo dõi trạng thái hợp lệ
+        let isValid = true;
+
+        // Nếu không có hàng nào, currentRow sẽ là null
+        if (currentRow) {
+            // Kiểm tra tên thuốc
+            const tenThuocInput = currentRow.querySelector('.inputTenThuoc');
+            if (!tenThuocInput.value.trim()) {
+                tenThuocInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                tenThuocInput.classList.remove('is-invalid');
+            }
+
+            // Kiểm tra đơn vị
+            const donViInput = currentRow.querySelector('.inputDonViThuoc');
+            if (!donViInput.value) {
+                donViInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                donViInput.classList.remove('is-invalid');
+            }
+
+            // Kiểm tra số lượng
+            const soLuongInput = currentRow.querySelector('.inputSoLuongThuoc');
+            if (!soLuongInput.value) {
+                soLuongInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                soLuongInput.classList.remove('is-invalid');
+            }
+
+            // Kiểm tra cách dùng
+            const cachDungInput = currentRow.querySelector('.inputCachDung');
+            if (!cachDungInput.value.trim()) {
+                cachDungInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                cachDungInput.classList.remove('is-invalid');
+            }
+        }
+
+        // Nếu tất cả các ô nhập liệu hợp lệ hoặc không có hàng nào, thêm hàng mới
+        if (isValid || !currentRow) {
+            const tableBody = document.querySelector('#donThuoc tbody'); // Select the table body
+            const newRow = `<tr class="rowThuoc" data-row-number="${rowCount}">
+                        <td class="numberThuoc">${rowCount}</td>
+                        <td>
+                            <div class="container tenthuoc is-invalid">
+                                <input class="form-control inputTenThuoc" type="text" placeholder="" required>
+                                <input class="getThuocId" type="hidden" value="">
+                                <ul class="list-group suggestionThuoc" style="display: none;">
+                                    {% for t in thuoc %}
+                                    <li class="list-group-item itemThuoc" onclick="selectThuoc('{{t.idThuoc}}', '{{t.tenThuoc}}', '{{t.huongDanSuDung}}', '{{t.loaiThuoc}}', this)">
+                                        {{ t.tenThuoc }}
+                                        <input class="" type="hidden" name="{{ t.idThuoc }}" value="{{ t.idThuoc }}">
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="donViThuoc">
+                            <select class="form-select inputDonViThuoc" required disabled>
+                                <option selected value="" ></option>
+                                <option value="VY" >Vỉ</option>
+                                <option value="CHAI" >Chai</option>
+                                <option value="HOP" >Hộp</option>
+                            </select>
+                        </td>
+                        <td class="slThuoc">
+                            <input type="number" class="form-control inputSoLuongThuoc" min="1" max="10" required disabled>
+                        </td>
+                        <td class="cachDungThuoc">
+                            <input type="text" class="form-control inputCachDung" placeholder="" autofocus required disabled>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" id="xoaThuoc" onclick="removeRow(${rowCount})">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', newRow); // Append the new row to the table
+
+            rowCount++; // Increment the row count
+        }
+    }
+
+
+    // hàm ràng buộc thuốc + chẩn đoán
+    $(document).ready(function () {
+        // Enable the next input field when the current one is filled
+        $(document).on('input', '.inputTenThuoc', function () {
+            const currentRow = $(this).closest('tr');
+            const nextField = currentRow.find('.inputDonViThuoc');
+
+            if ($(this).val().trim() !== '') {
+                nextField.removeAttr('disabled'); // Enable the unit field
+            } else {
+                nextField.attr('disabled', 'disabled'); // Disable if the current field is empty
+                nextField.val(''); // Clear the value if disabled
+                currentRow.find('.inputSoLuongThuoc').attr('disabled', 'disabled').val(''); // Disable and clear quantity
+                currentRow.find('.inputCachDung').attr('disabled', 'disabled').val(''); // Disable and clear usage
+            }
+        });
+
+        $(document).on('input', '.inputDonViThuoc', function () {
+            const currentRow = $(this).closest('tr')
+            const nextField = currentRow.find('.inputSoLuongThuoc')
+            if ($(this).val() !== '') {
+                nextField.removeAttr('disabled')
+            } else {
+                nextField.attr('disabled', 'disabled');
+                nextField.val('')
+            }
+        });
+
+        $(document).on('input', '.inputSoLuongThuoc', function () {
+            const currentRow = $(this).closest('tr');
+            const nextField = currentRow.find('.inputCachDung');
+            if ($(this).val() !== '') {
+                nextField.removeAttr('disabled'); // Enable the usage field
+            } else {
+                nextField.attr('disabled', 'disabled'); // Disable if the current field is empty
+                nextField.val(''); // Clear the value if disabled
+            }
+        });
+    });
+
+    // Hàm để xóa hàng thuốc
+    function removeRow(rowNumber) {
+        const row = document.querySelector(`tr[data-row-number="${rowNumber}"]`);
+        if (row) {
+            row.remove();
+            updateRowNumbers(); // Update row numbers after removal
+        }
+    }
+
+    // Hàm cập nhật số thứ tự khi xóa thuốc
+    function updateRowNumbers() {
+        const rows = document.querySelectorAll('#donThuoc tbody tr');
+        rows.forEach((row, index) => {
+            const numberCell = row.querySelector('.numberThuoc');
+            numberCell.textContent = index + 1; // Update the displayed row number
+            row.setAttribute('data-row-number', index + 1); // Update the data attribute
+        });
+        rowCount = rows.length + 1; // Update rowCount based on the current number of rows
+    }
+
+    //chọn thuốc trên mục gợi ý
+    function selectThuoc(idThuoc, tenthuoc, cachDung, loaiThuoc, element) {
+        // Tìm hàng thuốc hiện tại
+        const currentRow = $(element).closest("tr");
+        const nextField = currentRow.find('.inputDonViThuoc');
+        var tenThuocTrim = tenthuoc;
+        var cachDungTrim = cachDung;
+        currentRow.find(".getThuocId").val(idThuoc);
+        currentRow.find('.inputTenThuoc').val(tenThuocTrim);
+        currentRow.find('.inputCachDung').val(cachDungTrim);
+        // Gỡ bỏ thuộc tính disabled cho trường Đơn Vị
+        nextField.removeAttr('disabled'); // Enable the unit field
+
+        // // Thêm tên thuốc vào đầu select (Giả sử select có id là 'thuocSelect')
+        // const selectElement = currentRow.find("")
+        // const newOption = $('<option>', {
+        //     value: idThuoc,
+        //     text: tenThuocTrim
+        // });
+        // // Thêm option mới vào đầu select
+        // selectElement.prepend(newOption);
+
+        // Ẩn danh sách gợi ý
+        $(this).closest("ul").hide();
+    }
+
+    // Tìm kiếm thuốc khi người dùng nhập
+</script>
+
+
+<!-- saver draft -->
+<script>
+    //save draft
+    $(document).ready(function () {
+        $('#luuNhapPhieuKham').click(function () {
+            // Hiển thị hộp thoại xác nhận
+            Swal.fire({
+                title: 'Xác nhận lưu nháp',
+                text: 'Bạn có chắc chắn muốn lưu nháp thông tin này không?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    saveDraft(); // Gọi hàm lưu nháp
+                } else {
+                    Swal.fire('Đã hủy lưu nháp!');
+                }
+            });
+        });
+    });
+
+    function saveDraft(id) {
+        console.log("Hàm saveDraft đã được gọi");
+        // Lấy dữ liệu từ các trường nhập liệu
+        const ngayKham = $('#iddateChanDoan').val();
+        const trieuChung = $('#trieuchungInput').val();
+        const chanDoan = $('#chandoanInput').val();
+        const idBenhNhan = id; // Lấy ID bệnh nhân từ template
+
+        // Lấy thông tin đơn thuốc
+        const listThuoc = [];
+        $('#donThuoc tbody tr').each(function () {
+            const idThuoc = $(this).find('.inputTenThuoc').name()
+            const tenThuoc = $(this).find('.inputTenThuoc').val();
+            const donVi = $(this).find('.inputDonViThuoc').val();
+            const soLuong = $(this).find('.inputSoLuongThuoc').val();
+            const cachDung = $(this).find('.inputCachDung').val();
+
+            if (tenThuoc && donVi && soLuong && cachDung) {
+                listThuoc.push({
+                    idThuoc: idThuoc,
+                    tenThuoc: tenThuoc,
+                    donVi: donVi,
+                    soLuong: soLuong,
+                    cachDung: cachDung
+                });
+            }
+        });
+
+        // Gửi dữ liệu đến server
+        $.ajax({
+            url: '/api/luuNhap', // Đường dẫn đến route xử lý lưu nháp
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                idBenhNhan: idBenhNhan, // Gửi ID bệnh nhân
+                ngayKham: ngayKham,
+                trieuChung: trieuChung,
+                chanDoan: chanDoan,
+                listThuoc: listThuoc
+            }),
+            success: function () {
+                swal("Đã lưu nháp thành công!", {
+                    icon: "success",
+                }).then(() => {
+                    // Chuyển hướng đến trang lịch khám hôm nay
+                    window.location.href = `/lapphieukham/lichkham.html?tinh_trang=${tinh_trang}`
+                });
+            },
+            error: function (error) {
+                swal("Có lỗi xảy ra khi lưu nháp.", {
+                    icon: "error",
+                });
+            }
+        });
+    }
+
+    function loadDraft(patientId) {
+        $.ajax({
+            url: `/get_draft/${patientId}`, // Đường dẫn đến route truy vấn
+            type: 'GET',
+            success: function (response) {
+                if (response.status === 'success') {
+                    const draft = response.data;
+                    // Cập nhật các trường nhập liệu với dữ liệu nháp
+                    $('#iddateChanDoan').val(draft.ngayKham);
+                    $('#trieuchungInput').val(draft.trieuChung);
+                    $('#chandoanInput').val(draft.chanDoan);
+
+                    // Xóa tất cả các hàng thuốc hiện tại
+                    $('#donThuoc tbody').empty();
+
+                    // Thêm các hàng thuốc từ dữ liệu nháp
+                    draft.medications.forEach((medication, index) => {
+                        const newRow = `<tr>
+                        <td class="numberThuoc">${index + 1}</td>
+                        <td>
+                            <input class="form-control inputTenThuoc" type="text" value="${medication.tenThuoc}" required>
+                        </td>
+                        <td class="donViThuoc">
+                            <select class="form-select inputDonViThuoc" required>
+                                <option value="${medication.donVi}" selected>${medication.donVi}</option>
+                                <option value="1">Vỉ</option>
+                                <option value="2">Chai</option>
+                                <option value="3">Hộp</option>
+                            </select>
+                        </td>
+                        <td class="slThuoc">
+                            <input type="number" class="form-control inputSoLuongThuoc" value="${medication.quantity}" min="1" max="10" required>
+                        </td>
+                        <td class="cachDungThuoc">
+                            <input type="text" class="form-control inputCachDung" value="${medication.usage}" required>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" onclick="removeRow(${index + 1})">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                        $('#donThuoc tbody').append(newRow);
+                    });
+                } else {
+                    alert('Không tìm thấy dữ liệu nháp cho bệnh nhân này.');
+                }
+            },
+            error: function (error) {
+                alert('Có lỗi xảy ra khi truy vấn dữ liệu nháp.');
+            }
+        });
+    }
+
+</script>
+
+
+<!--save -->
+
+<script>
+    function exportMedicalRecord() {
+        // Lấy dữ liệu từ các trường nhập liệu
+        const ngayKham = document.getElementById('iddateChanDoan').value;
+        const trieuChung = document.getElementById('trieuchungInput').value;
+        const chanDoan = document.getElementById('chandoanInput').value;
+        // const loiKhuyen = document.getElementById('loiKhuyenInput').value;
+        const idBenhNhan = '{{ benhnhan.idBenhNhan }}'; // Lấy ID bệnh nhân từ template
+        console.log(idBenhNhan)
+        // Kiểm tra các trường nhập liệu
+        let isValid = true;
+
+        // Kiểm tra ngày khám
+        if (!ngayKham) {
+            document.getElementById('iddateChanDoan').classList.add('is-invalid');
+            isValid = false;
+        } else {
+            document.getElementById('iddateChanDoan').classList.remove('is-invalid');
+        }
+
+        // Kiểm tra triệu chứng
+        if (!trieuChung) {
+            document.getElementById('trieuchungInput').classList.add('is-invalid');
+            isValid = false;
+        } else {
+            document.getElementById('trieuchungInput').classList.remove('is-invalid');
+        }
+
+        // Kiểm tra chẩn đoán
+        if (!chanDoan) {
+            document.getElementById('chandoanInput').classList.add('is-invalid');
+            isValid = false;
+        } else {
+            document.getElementById('chandoanInput').classList.remove('is-invalid');
+        }
+
+        // Nếu tất cả các trường hợp lệ, gửi dữ liệu đến server
+
+        // Lấy thông tin đơn thuốc
+        if (isValid) {
+            if (confirm('Bạn muốn lưu phiếu khám') === true) {
+                const listThuoc = [];
+                document.querySelectorAll('#donThuoc tbody tr').forEach((row) => {
+                    const idThuoc = row.querySelector('.getThuocId').value;
+                    const tenThuoc = row.querySelector('.inputTenThuoc').value;
+                    const donVi = row.querySelector('.inputDonViThuoc').value;
+                    const soLuong = row.querySelector('.inputSoLuongThuoc').value;
+                    const cachDung = row.querySelector('.inputCachDung').value;
+
+                    listThuoc.push({
+                        idThuoc: idThuoc,
+                        tenThuoc: tenThuoc,
+                        donVi: donVi,
+                        soLuong: soLuong,
+                        cachDung: cachDung
+                    });
+                });
+                console.log(listThuoc)
+                // Gửi dữ liệu đến server
+                fetch('/api/luuPhieuKham', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        idBenhNhan: idBenhNhan,
+                        ngayKham: ngayKham,
+                        trieuChung: trieuChung,
+                        chanDoan: chanDoan,
+                        // loiKhuyen: loiKhuyen,
+                        listThuoc: listThuoc
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Tải thành công")
+                            location.reload();
+                            alert(data.message);
+                        } else {
+                            alert("Lưu không thành công");
+                        }
+                    })
+                    .catch
+                    (error => {
+                        console.error("Error:", error);
+                        alert("Có lỗi xảy ra, vui lòng thử lại.");
+                    });
+            }
+        }
+    }
+
+</script>
+
+<!-- hồ sơ bệnh nhân-->
+<script>
+    function toggleSidebar() {
+        var sidebar = document.getElementById('hosobenhnhan');
+        var isVisible = sidebar.style.right === '0px'; // Kiểm tra nếu sidebar đang hiển thị
+
+        if (isVisible) {
+            sidebar.style.right = '-100%'; // Ẩn sidebar đi
+        } else {
+            sidebar.style.right = '0'; // Hiển thị sidebar
+        }
+    }
+
+    function toggleSidebar_back() {
+        var sidebar = document.getElementById('hosobenhnhan');
+        var isVisible = sidebar.style.right === '0px'; // Kiểm tra nếu sidebar đang hiển thị
+        if (isVisible) {
+            sidebar.style.right = '-100%'; // Ẩn sidebar đi
+        }
+    }
+
+</script>
+{% endblock %}
