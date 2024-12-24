@@ -235,22 +235,22 @@ if __name__ == '__main__':
         # db.session.add(thu_ngan)
         # db.session.commit()
         #
-        # quan_tri = QuanTri(
-        #     ngayVaoLam="2019-11-01",
-        #     bangCap="Cử Nhân",
-        #     hoTen="Nguyen Duc A",
-        #     username="quantri_a",
-        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #     gioiTinh=True,
-        #     ngaySinh="1999-11-16",
-        #     cccd="100056778911",
-        #     diaChi="Nguyễn Văn Linh, Quận 7",
-        #     sdt="0992443668",
-        #     phongBan="PB_IT"
-        # )
-        #
-        # db.session.add(quan_tri)
-        # db.session.commit()
+        quan_tri = QuanTri(
+            ngayVaoLam="2019-11-01",
+            bangCap="Cử Nhân",
+            hoTen="Nguyen Duc A",
+            username="quantri_ab",
+            password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+            gioiTinh=True,
+            ngaySinh="1999-11-16",
+            cccd="100054779911",
+            diaChi="Nguyễn Văn Linh, Quận 7",
+            sdt="0992443168",
+            phongBan="PB_IT"
+        )
+
+        db.session.add(quan_tri)
+        db.session.commit()
         #
         # quan_tri = QuanTri(
         #     ngayVaoLam="2019-11-01",

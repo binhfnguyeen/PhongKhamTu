@@ -145,7 +145,8 @@ def get_ds_lichkham_relationship(user_id):
     return db.session.query(LichKham.idLichKham,
                             LichKham.ngayDangKy,
                             LichKham.ngayKham,
-                            YTa.hoTen.label('yta_name')).join(YTa, LichKham.id_yta == YTa.idYTa, isouter=True).filter(LichKham.id_benhnhan == user_id).all()
+                            YTa.hoTen.label('yta_name')).join(YTa, LichKham.id_yta == YTa.idYTa, isouter=True).filter(
+        LichKham.id_benhnhan == user_id).all()
 
 
 def get_danhsach_lichkham_benhnhan():
@@ -319,6 +320,7 @@ def add_comment(content):
     db.session.commit()
     return c
 
+
 def load_phieu_kham():
     results = db.session.query(
         PhieuKham.idPhieuKham,
@@ -353,8 +355,8 @@ def tim_phieukham_theo_id(id):
         BenhNhan.hoTen.label('ten_benhnhan'),
         BacSi.hoTen.label('ten_bacsi')
     ).join(BenhNhan, PhieuKham.id_benhnhan == BenhNhan.idBenhNhan) \
-    .join(BacSi, PhieuKham.id_bacsi == BacSi.idBacSi) \
-    .filter(PhieuKham.idPhieuKham == id).first()
+        .join(BacSi, PhieuKham.id_bacsi == BacSi.idBacSi) \
+        .filter(PhieuKham.idPhieuKham == id).first()
 
     if result:
         ngaytao = result.ngaytao.strftime('%d/%m/%Y') if result.ngaytao else None
@@ -405,8 +407,8 @@ def thuoc_theo_phieukham(id_phieukham):
             Thuoc.loaiThuoc,
             ChiTietDonThuoc.soLuongThuoc
         ).join(ChiTietDonThuoc, Thuoc.idThuoc == ChiTietDonThuoc.id_thuoc) \
-         .join(PhieuKham, ChiTietDonThuoc.id_phieukham == PhieuKham.idPhieuKham) \
-         .filter(PhieuKham.idPhieuKham == id_phieukham).all()
+            .join(PhieuKham, ChiTietDonThuoc.id_phieukham == PhieuKham.idPhieuKham) \
+            .filter(PhieuKham.idPhieuKham == id_phieukham).all()
 
         if thuoc_query:
             thuoc_list = []
@@ -448,6 +450,7 @@ def make_invoice(id_phieukham, tienkham, tienthuoc, id_thungan):
     db.session.commit()
 
     return hoa_don
+
 
 def load_comment():
     return Comment.query.all()
@@ -508,6 +511,63 @@ def get_LichKham_Today():
     except Exception as e:
         print(f"Lỗi khi truy vấn dữ liệu: {e}")
         return []
+
+
+def get_LichKham_by_Yta():
+    if 'lich_kham_ids' in session:
+        if session['lich_kham_ids']:
+            dsLickKham_id = session.get('lich_kham_ids')
+            dslickKham = []
+            print(dsLickKham_id)
+            # Duyệt qua các id trong session['lich_kham_ids'] và lấy thông tin chi tiết
+            for id in dsLickKham_id:
+                # Lấy thông tin phiếu khám và bệnh nhân
+                lichKham = db.session.query(
+                    LichKham.idLichKham,
+                    LichKham.id_benhnhan,
+                    LichKham.ngayKham,
+                    BenhNhan.hoTen,
+                    BenhNhan.ngaySinh,
+                    BenhNhan.diaChi,
+                    BenhNhan.gioiTinh,
+                    BenhNhan.avatar,
+                    BenhNhan.cccd
+                ).join(BenhNhan, BenhNhan.idBenhNhan == LichKham.id_benhnhan).filter(LichKham.idLichKham == id).first()
+
+                if lichKham:
+                    dslickKham.append(lichKham)
+
+            kq = []
+            for i, row in enumerate(dslickKham, start=1):
+                if row:  # Kiểm tra nếu kết quả không phải None
+                    # Tạo dữ liệu trả về cho từng phiếu khám
+                    kq.append({
+                        'stt': i,
+                        'id_lich': row.idLichKham,
+                        'id_benhnhan': row.id_benhnhan,
+                        'hoVaTen': row.hoTen,
+                        'gioiTinh': row.gioiTinh,
+                        'namSinh': row.ngaySinh.strftime("%d/%m/%Y") if row.ngaySinh else None,
+                        'diaChi': row.diaChi,
+                        'ngayKham': row.ngayKham.strftime("%d/%m/%Y") if row.ngayKham else None,
+                        'avatar': row.avatar,
+                        'cccd': row.cccd,
+                        'tinhTrang': 0  # Có thể thay thế bằng enum hoặc trạng thái thực tế của phiếu khám
+                    })
+
+            # Sắp xếp theo trạng thái và thứ tự
+            kq.sort(key=lambda x: (x['tinhTrang'], x['stt']))
+            return kq
+
+    # Trả về danh sách rỗng nếu không có thông tin
+    return []
+
+
+# if __name__ == '__main__':
+#     with app.test_request_context():  # Thay app.app_context() bằng test_request_context()
+#         # Đặt giá trị cho session tại đây nếu cần
+#         session['lich_kham_ids'] = [1]  # Ví dụ về việc gán giá trị cho session
+#         print(get_LichKham_by_Yta())
 
 
 def get_patient_and_appointment():
@@ -571,7 +631,7 @@ def luuPhieuKham(idBenhNhan, idBacSi, listThuoc, ngayKham, trieuChung, chanDoan)
 
     phieuKham = PhieuKham(ngayTao=datetime.strptime(ngayKham, "%Y-%m-%d"),
                           id_benhnhan=int(idBenhNhan), trieuChung=trieuChung,
-                          chanDoan=chanDoan, id_bacsi=int(idBacSi), id_hoadon = None)
+                          chanDoan=chanDoan, id_bacsi=int(idBacSi), id_hoadon=None)
 
     db.session.add(phieuKham)
     db.session.commit()
@@ -722,11 +782,6 @@ def get_ListThuoc(idPhieuKham):
     return listThuoc_result
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        print(get_LSKB(5))
-
-
 def get_thuoc():
     # Lấy tất cả các thuốc từ cơ sở dữ liệu
     thuocs = Thuoc.query.all()
@@ -747,11 +802,6 @@ def get_thuoc():
     return danh_sach_thuoc
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        print(get_thuoc())
-
-
 def getListPhieuKham(idBenhNhan):
     listLichKham = db.session.query(PhieuKham).filter(PhieuKham.id_benhnhan == idBenhNhan).all()
     return listLichKham
@@ -765,3 +815,19 @@ def benhnhan_to_dict(bn):
 def get_current_date_as_string():
     output_format = '%d/%m/%Y'
     return datetime.today().strftime(output_format)
+
+
+def add_HoSoBenhNhan(id_benhnhan):
+    try:
+        hoso = HoSoBenhNhan(
+            ngayTao=datetime.now(),
+            tinhTrang="Binh Thuong",
+            id_benhnhan=id_benhnhan
+        )
+        db.session.add(hoso)
+        db.session.commit()
+        return f"Đã tạo hồ sơ cho bệnh nhân ID {id_benhnhan}"
+    except Exception as e:
+        db.session.rollback()
+        print(f"Lỗi trong add_HoSoBenhNhan: {e}")
+        raise e

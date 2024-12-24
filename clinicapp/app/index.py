@@ -93,6 +93,7 @@ def signup_process():
             data = request.form.copy()
             del data['confirm']
             dao.add_user(avatar=request.files.get('avatar'), **data)
+
             flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
             return redirect('/login')
         else:
@@ -190,6 +191,11 @@ def update_profile():
                         diaChi=diachi.strip(),
                         sdt=sdt.strip()
                     )
+
+                if hasattr(current_user, 'idBenhNhan') and current_user.idBenhNhan:
+                    a = dao.add_HoSoBenhNhan(current_user.idBenhNhan)
+                    print("Ho so" + a)
+
                 flash("Lưu thông tin thành công!", "success")
                 return redirect('/trangcanhan')
 
@@ -399,17 +405,16 @@ def lapphieukham():
                            benhnhan=benhnhan, hosobenhnhan = hosobenhnhan, thuoc=thuoc, tinh_trang=dao.TINH_TRANG, lichSuKhamBenh=lichSuKhamBenh)
 
 
-@app.route('/lichkham', methods=['GET'])
+@app.route('/lichkham', methods=['GET' , 'POST'])
 def lichkham():
-    lichKhamToday = dao.get_LichKham_Today()
-    # tinh trang bi thay doi
-    if (dao.check_reload_LichKham(lichKhamToday, session.get('lichKhamToday', []))):
-        return render_template('lapphieukham/lichkham.html', tinh_trang=dao.TINH_TRANG, date=dao.get_current_date_as_string())
+    lichKhamToday = dao.get_LichKham_by_Yta()
 
+    # if (dao.check_reload_LichKham(lichKhamToday, session.get('lichKhamToday', []))):
+    #     return render_template('lapphieukham/lichkham.html', tinh_trang=dao.TINH_TRANG, date=dao.get_current_date_as_string())
+    del session['lichKhamToday']
     session['lichKhamToday'] = lichKhamToday
     print(session['lichKhamToday'])
     return render_template('lapphieukham/lichkham.html', tinh_trang=dao.TINH_TRANG,date=dao.get_current_date_as_string())
-
 
 @app.route('/api/luuNhap', methods=['POST'])
 def luuNhap():
