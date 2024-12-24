@@ -1,0 +1,203 @@
+{% extends 'admin/master.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style>
+    .form-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 40%;
+    }
+    .form-container input[type="month"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .report-header {
+        text-align: center;
+        margin-top: 20px;
+        color: #5a5a5a;
+    }
+    table {
+        margin-top: 30px;
+        background-color: #ffffff;
+    }
+    th {
+        background-color: #f1f1f1;
+        color: #333;
+        text-align: center;
+    }
+    td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .btn-submit {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .btn-submit:focus {
+        outline: none;
+    }
+</style>
+{% endblock head_css %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="form-container">
+        <h4 class="text-center mb-3">BÁO CÁO SỬ DỤNG THUỐC</h4>
+        <form method="POST" action="{{ url_for('sudungthuocview.index') }}">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="month_year_baocao" class="labels">Chọn tháng và năm</label>
+                    <div class="input-group">
+                        <input type="month" class="form-control form-control-sm" name="month_year_baocao"
+                               placeholder="Chọn tháng và năm" value="" id="month_year_baocao">
+                    </div>
+                </div>
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-submit btn-sm">Xem Báo Cáo</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    {% if month and year %}
+    <h2 class="report-header">BÁO CÁO SỬ DỤNG THUỐC THEO THÁNG</h2>
+    <h3 class="report-header">Tháng {{ month }} Năm {{ year }}</h3>
+    <table id="bao_cao_thuoc" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên thuốc</th>
+            <th>Đơn vị</th>
+            <th>Tổng số lượng</th>
+            <th>Số lần dùng</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in report_data %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ row.ten_thuoc }}</td>
+            <td>{{ row.don_vi }}</td>
+            <td>{{ row.tong_so_luong }}</td>
+            <td>{{ row.so_lan_dung }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-12 d-flex justify-content-center">
+            <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
+        </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-start mt-3">
+        <button type="button" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                id="xuat_pdf" onclick="xuatPDF()">
+            <i class="bi bi-file-earmark-pdf me-2"></i> Xuất PDF
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+{% block tail_js %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = [];
+    let chartData = [];
+
+    {% for row in report_data %}
+        labels.push("{{ row.ten_thuoc }}");
+        chartData.push(parseInt({{ row.so_lan_dung }}));
+    {% endfor  %}
+
+    console.log(labels)
+    console.log(chartData)
+
+    window.onload = function() {
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sử dụng thuốc theo ngày',
+                    data: chartData,
+                    borderWidth: 2,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function xuatPDF() {
+        const table = document.querySelector("#bao_cao_thuoc");
+        if (table) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Báo cáo sử dụng thuốc", 14, 15);
+
+            const monthYear = document.querySelector(".report-header:nth-child(2)").textContent.trim();
+            doc.setFontSize(12);
+            doc.text(monthYear, 14, 25);
+
+            doc.autoTable({
+                html: "#bao_cao_thuoc",
+                startY: 30,
+                theme: 'grid',
+                styles: {
+                    font: "Helvetica",
+                    fontSize: 10,
+                    cellPadding: 4,
+                },
+                headStyles: {
+                    fillColor: [220, 220, 220],
+                    textColor: [0, 0, 0],
+                    halign: 'center',
+                },
+                bodyStyles: {
+                    halign: 'center',
+                },
+            });
+
+            doc.save("bao_cao_su_dung_thuoc.pdf");
+        } else {
+            alert("Không có dữ liệu để xuất PDF.");
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

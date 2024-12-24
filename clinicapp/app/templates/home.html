@@ -4,6 +4,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+
 {% endblock %}
 
 {% block content %}
@@ -94,52 +95,58 @@
     </section>
 
     <section id="testimonials" class="py-5 bg-light">
-        <div class="container text-center">
-            <h2 class="mb-4">Đánh Giá Từ Bệnh Nhân</h2>
+        <div class="container">
+            <h1 class="text-center mb-5 fw-bold">Đánh Giá Từ Bệnh Nhân</h1>
             <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-6 mb-3">
-                    <div class="card shadow-sm border-light rounded text-center testimonial-card"
-                         style="width: 90%; max-width: 350px; margin: 0 auto;">
-                        <div class="card-img-wrapper" style="width: 50%; margin: 0 auto;">
-                            <img class="img-fluid"
-                                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1732608371/samples/man-portrait.jpg"
-                                 alt="Card image" style="height: 200px; object-fit: cover; width: 100%;">
-                        </div>
-                        <div class="card-body">
-                            <h4 class="card-title">Ngô Lệ</h4>
-                            <p class="card-text">Luôn nhận được sự ân cần và nhẹ nhàng từ bác sĩ, các mom đi khám khi
-                                gặp vấn đề gì có thể hỏi trực tiếp hoặc nhắn tin đều được bác Gái giải đáp..</p>
+                {% if current_user.is_authenticated %}
+                <div class="col-md-8">
+                    <div class="card shadow-sm p-4 mb-4 border-0">
+                    <textarea class="form-control shadow-none border-0" rows="4" id="comment" name="text"
+                              placeholder="Hãy để lại ý kiến của bạn..." style="resize: none;"></textarea>
+                        <button class="btn btn-primary mt-3 w-100 fw-bold shadow-sm" onclick="addComment(event)">Gửi
+                            Bình Luận
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-md-8 text-center">
+                    <p class="lead">Vui lòng <a href="/login?next=/" class="text-primary fw-bold">đăng nhập</a> để bình
+                        luận!</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row" id="comments" style="max-height: 400px; overflow-y: auto;">
+                {% for c in comments %}
+                <div class="col-md-12 mb-3">
+                    <div class="d-flex align-items-start shadow-sm p-4 bg-white rounded">
+                        <img src="{{ c.user.avatar }}" alt="Avatar" class="rounded-circle me-3"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <h6 class="mb-0 fw-bold text-primary me-2">{{ c.user.hoTen }}</h6>
+                                <small class="text-muted date">{{ c.created_date }}</small>
+                            </div>
+                            <p class="text-secondary">{{ c.content }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
-                    <div class="card shadow-sm border-light rounded text-center testimonial-card"
-                         style="width: 90%; max-width: 350px; margin: 0 auto;">
-                        <div class="card-img-wrapper" style="width: 50%; margin: 0 auto;">
-                            <img class="img-fluid"
-                                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1732608363/samples/people/boy-snow-hoodie.jpg"
-                                 alt="Card image" style="height: 200px; object-fit: cover; width: 100%;">
+                {% endfor %}
+                {% for c in list_comment %}
+                <div class="media d-flex align-items-start shadow-sm p-3 mb-3 bg-white rounded">
+                    <div class="media-left me-3">
+                        <img src="{{ c.user.avatar }}" class="media-object rounded-circle"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
+                    <div class="media-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <h6 class="media-heading mb-0 fw-bold me-2 text-primary">{{ c.user.hoTen }}</h6>
+                            <small class="text-muted date">{{ c.created_date }}</small>
                         </div>
-                        <div class="card-body">
-                            <h4 class="card-title">John Doe</h4>
-                            <p class="card-text">Cơ sở vật chất tốt, dịch vụ 10 điểm</p>
-                        </div>
+                        <p class="text-secondary">{{ c.content }}</p>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-3">
-                    <div class="card shadow-sm border-light rounded text-center testimonial-card"
-                         style="width: 90%; max-width: 350px; margin: 0 auto;">
-                        <div class="card-img-wrapper" style="width: 50%; margin: 0 auto;">
-                            <img class="img-fluid"
-                                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1732608371/samples/upscale-face-1.jpg"
-                                 alt="Card image" style="height: 200px; object-fit: cover; width: 100%;">
-                        </div>
-                        <div class="card-body">
-                            <h4 class="card-title">Lệ Quyên</h4>
-                            <p class="card-text">Chuyên môn cao</p>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -183,6 +190,65 @@
     </section>
 
 </form>
+
+<script>
+    function addComment(event) {
+        event.preventDefault();
+
+        const comment = document.getElementById("comment").value;
+
+        if (!comment) {
+            alert("Nội dung bình luận không được để trống");
+            return;
+        }
+
+        fetch(`/api/comments`, {
+            method: "POST",
+            body: JSON.stringify({ content: comment }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Failed to add comment");
+            }
+            return res.json();
+        })
+        .then(c => {
+            let html = `
+                <div class="media d-flex align-items-start shadow-sm p-3 mb-3 bg-white rounded">
+                    <div class="media-left me-3">
+                        <img src="${c.user.avatar}" class="rounded-circle"
+                             style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #f0f0f0;">
+                    </div>
+                    <div class="media-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0 fw-bold text-primary">${c.user.hoTen}</h4>
+                            <small class="text-muted date">${c.created_date}</small>
+                        </div>
+                        <p class="mb-0 text-secondary">${c.content}</p>
+                    </div>
+                </div>
+            `;
+
+            const commentList = document.getElementById("comments");
+            commentList.innerHTML = html + commentList.innerHTML;
+
+            document.getElementById("comment").value = "";
+        })
+        .catch(error => {
+            console.error("Error adding comment:", error);
+            alert("Có lỗi xảy ra, vui lòng thử lại.");
+        });
+    }
+
+    window.onload = function() {
+        let dates = document.getElementsByClassName("date");
+        for (let d of dates)
+            d.innerText = moment(d.innerText).locale("vi").fromNow();
+    }
+</script>
 {% endblock %}
 
 {% block js %}

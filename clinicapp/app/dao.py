@@ -1,10 +1,15 @@
 from datetime import datetime, date
+from datetime import datetime
+
+from flask_login import current_user
 from sqlalchemy import func
 from sqlalchemy.engine import row
 from sqlalchemy.orm import joinedload, join, outerjoin
 
 from clinicapp.app.models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, Thuoc, HoSoBenhNhan, \
     PhieuKham, ChiTietDonThuoc, HoaDon, DonVi
+from models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, HoaDon, Thuoc, ChiTietDonThuoc, \
+    PhieuKham, Comment
 from clinicapp.app import db, app
 import hashlib
 import cloudinary.uploader
@@ -12,43 +17,49 @@ from flask import session, flash, redirect, url_for, render_template, request
 from enum import Enum
 
 
+def get_object_by_id(model, id):
+    if not model or not id:
+        return None
+
+    return model.query.get(id)
+
+
 def get_id_user(id):
-    return BenhNhan.query.get(id)
+    return get_object_by_id(BenhNhan, id)
 
 
 def get_id_yta(id):
-    return YTa.query.get(id)
+    return get_object_by_id(YTa, id)
 
 
 def get_id_bacsi(id):
-    return BacSi.query.get(id)
+    return get_object_by_id(BacSi, id)
 
 
 def get_id_thungan(id):
-    return ThuNgan.query.get(id)
+    return get_object_by_id(ThuNgan, id)
 
 
-def auth_user(username, password):
-    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+def get_id_quantri(id):
+    return get_object_by_id(QuanTri, id)
 
-    benh_nhan = BenhNhan.query.filter(BenhNhan.username.__eq__(username.strip()),
-                                      BenhNhan.password.__eq__(password)).first()
-    if benh_nhan:
-        return benh_nhan
 
-    y_ta = YTa.query.filter(YTa.username.__eq__(username.strip()), YTa.password.__eq__(password)).first()
-    if y_ta:
-        return y_ta
+def auth_user(username, password, role):
+    password_hashed = hashlib.md5(password.strip().encode('utf-8')).hexdigest()
 
-    bac_si = BacSi.query.filter(BacSi.username.__eq__(username.strip()), BacSi.password.__eq__(password)).first()
-    if bac_si:
-        return bac_si
+    model_map = {
+        "benhnhan": BenhNhan,
+        "yta": YTa,
+        "bacsi": BacSi,
+        "thungan": ThuNgan,
+        "quantri": QuanTri
+    }
 
-    thu_ngan = ThuNgan.query.filter(ThuNgan.username.__eq__(username.strip()),
-                                    ThuNgan.password.__eq__(password)).first()
-    if thu_ngan:
-        return thu_ngan
+    model = model_map.get(role)
+    print(model)
 
+    if model:
+        return model.query.filter(model.username == username.strip(), model.password == password_hashed).first()
     return None
 
 
@@ -139,8 +150,7 @@ def get_ds_lichkham_relationship(user_id):
     return db.session.query(LichKham.idLichKham,
                             LichKham.ngayDangKy,
                             LichKham.ngayKham,
-                            YTa.hoTen.label('yta_name')).join(YTa, LichKham.id_yta == YTa.idYTa, isouter=True).filter(
-        LichKham.id_benhnhan == user_id).all()
+                            YTa.hoTen.label('yta_name')).join(YTa, LichKham.id_yta == YTa.idYTa, isouter=True).filter(LichKham.id_benhnhan == user_id).all()
 
 
 def get_danhsach_lichkham_benhnhan():
@@ -180,6 +190,143 @@ def yta_update_lichkham(lichkham_id, ngayKham, yta_id):
         db.session.rollback()
         print(f"Lỗi khi cập nhật lịch khám: {e}")
         raise
+
+
+def tong_tienkham_theo_ngay_trong_thang(month, year):
+    tong_tienkham = db.session.query(
+        HoaDon.ngayKham,
+        func.sum(HoaDon.tienKham).label('tong_tien_kham')
+    ).filter(
+        func.extract('month', HoaDon.ngayKham) == month,
+        func.extract('year', HoaDon.ngayKham) == year
+    ).group_by(HoaDon.ngayKham).all()
+
+    result = [
+        {
+            'ngay_kham': hoa_don.ngayKham.strftime('%d-%m-%Y'),
+            'tong_tien_kham': hoa_don.tong_tien_kham
+        } for hoa_don in tong_tienkham
+    ]
+
+    return result
+
+
+def tong_tienthuoc_theo_ngay_trong_thang(month, year):
+    tong_tienthuoc = db.session.query(
+        HoaDon.ngayKham,
+        func.sum(HoaDon.tienThuoc).label('tong_tien_thuoc')
+    ).filter(
+        func.extract('month', HoaDon.ngayKham) == month,
+        func.extract('year', HoaDon.ngayKham) == year
+    ).group_by(HoaDon.ngayKham).all()
+
+    result = [
+        {
+            'ngay_kham': hoa_don.ngayKham.strftime('%d-%m-%Y'),
+            'tong_tien_thuoc': hoa_don.tong_tien_thuoc
+        } for hoa_don in tong_tienthuoc
+    ]
+
+    return result
+
+
+def tong_benhnhan_theo_ngay_trong_thang(month, year):
+    tong_benhnhan = db.session.query(
+        HoaDon.ngayKham,
+        func.count(HoaDon.idHoaDon).label('so_benh_nhan')
+    ).filter(
+        func.extract('month', HoaDon.ngayKham) == month,
+        func.extract('year', HoaDon.ngayKham) == year
+    ).group_by(HoaDon.ngayKham).all()
+
+    result = [
+        {
+            'ngay_kham': hoa_don.ngayKham.strftime('%d-%m-%Y'),
+            'so_benh_nhan': hoa_don.so_benh_nhan
+        } for hoa_don in tong_benhnhan
+    ]
+
+    return result
+
+
+def thong_ke_theo_ngay(month, year):
+    tien_kham = tong_tienkham_theo_ngay_trong_thang(month, year)
+    tien_thuoc = tong_tienthuoc_theo_ngay_trong_thang(month, year)
+    benh_nhan = tong_benhnhan_theo_ngay_trong_thang(month, year)
+
+    report = []
+    tong_doanh_thu = 0
+    for ngay in tien_kham:
+        ngay_kham = ngay['ngay_kham']
+        tong_tien_kham = ngay['tong_tien_kham']
+        tong_tien_thuoc = next((item['tong_tien_thuoc'] for item in tien_thuoc if item['ngay_kham'] == ngay_kham), 0)
+        so_benh_nhan = next((item['so_benh_nhan'] for item in benh_nhan if item['ngay_kham'] == ngay_kham), 0)
+
+        doanh_thu = tong_tien_kham + tong_tien_thuoc
+        tong_doanh_thu += doanh_thu
+        ty_le = (so_benh_nhan / doanh_thu) * 100 if doanh_thu != 0 else 0
+
+        report.append({
+            'ngay_kham': ngay_kham,
+            'doanh_thu': doanh_thu,
+            'so_benh_nhan': so_benh_nhan,
+            'tyle': round(ty_le, 2),
+        })
+
+    report.sort(key=lambda x: x['ngay_kham'])
+    return report, tong_doanh_thu
+
+
+def thong_ke_su_dung_thuoc_theo_ngay(month, year):
+    try:
+        results = db.session.query(
+            Thuoc.tenThuoc,
+            Thuoc.loaiThuoc.label("don_vi"),
+            func.sum(ChiTietDonThuoc.soLuongThuoc).label("tong_so_luong"),
+            func.count(ChiTietDonThuoc.id_thuoc).label("so_lan_dung")
+        ).join(
+            ChiTietDonThuoc, ChiTietDonThuoc.id_thuoc == Thuoc.idThuoc
+        ).join(
+            PhieuKham, ChiTietDonThuoc.id_phieukham == PhieuKham.idPhieuKham
+        ).filter(
+            func.extract("month", PhieuKham.ngayTao) == month,
+            func.extract("year", PhieuKham.ngayTao) == year
+        ).group_by(
+            Thuoc.tenThuoc,
+            Thuoc.loaiThuoc
+        ).order_by(
+            Thuoc.tenThuoc.asc()
+        ).all()
+
+        report = [
+            {
+                "ten_thuoc": r.tenThuoc,
+                "don_vi": r.don_vi.name,
+                "tong_so_luong": r.tong_so_luong,
+                "so_lan_dung": r.so_lan_dung
+            }
+            for r in results
+        ]
+
+        return report
+    except Exception as e:
+        print(f"Lỗi khi thống kê sử dụng thuốc: {e}")
+        return {"status": "error", "message": str(e)}
+
+
+def add_comment(content):
+    if not current_user.is_authenticated:
+        raise ValueError("User must be authenticated to comment")
+
+    c = Comment(content=content, user_id=current_user.idBenhNhan)
+
+    db.session.add(c)
+    db.session.commit()
+    return c
+
+
+def load_comment():
+    return Comment.query.all()
 
 
 # lập phiếu khám function
