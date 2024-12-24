@@ -477,8 +477,20 @@ TINH_TRANG = {
 
 
 def get_id_benhnhan(id):
-    return BenhNhan.query.filter_by(idBenhNhan=id).first()
+    benhnhan = BenhNhan.query.filter_by(idBenhNhan=id).first()
+    kq = {
+        'idBenhNhan': benhnhan.idBenhNhan,
+        'hoTen': benhnhan.hoTen,
+        'gioiTinh': benhnhan.gioiTinh,
+        'ngaySinh': benhnhan.ngaySinh.strftime('%d/%m/%Y'),
+        'diaChi': benhnhan.diaChi,
+        'avatar': benhnhan.avatar
+    }
+    return kq
 
+if __name__ == '__main__':
+    with app.app_context():
+        print(get_id_benhnhan(1))
 
 def get_LichKham_Today():
     today = date.today()
@@ -570,46 +582,6 @@ def get_LichKham_by_Yta():
 #         print(get_LichKham_by_Yta())
 
 
-def get_patient_and_appointment():
-    # Lấy idLichKham từ session
-    id_lich_kham = session.get('idLichKham')
-
-    if not id_lich_kham:
-        return None  # Trả về None nếu không có ID trong session
-
-    # Truy vấn dữ liệu với join
-    result = db.session.query(
-        BenhNhan.hoTen,
-        BenhNhan.username,
-        BenhNhan.gioiTinh,
-        BenhNhan.ngaySinh,
-        BenhNhan.cccd,
-        BenhNhan.diaChi,
-        BenhNhan.sdt,
-        LichKham.ngayDangKy,
-        LichKham.ngayKham
-    ).join(
-        LichKham, BenhNhan.idBenhNhan == LichKham.id_benhnhan
-    ).filter(
-        LichKham.idLichKham == id_lich_kham
-    ).first()
-
-    # Kiểm tra kết quả
-    if result:
-        # Định dạng kết quả trả về dưới dạng từ điển
-        return {
-            'hoTen': result.hoTen,
-            'username': result.username,
-            'gioiTinh': 'Nam' if result.gioiTinh else 'Nữ',
-            'ngaySinh': str(result.ngaySinh),
-            'cccd': result.cccd,
-            'diaChi': result.diaChi,
-            'sdt': result.sdt,
-            'ngayDangKy': str(result.ngayDangKy),
-            'ngayKham': str(result.ngayKham)
-        }
-    else:
-        return None
 
 
 def check_reload_LichKham(listLK, listCheck):
@@ -693,11 +665,11 @@ def get_TT_HoSoBenhNhan(idBenhNhan):
     if result:
         return {
             'idHoSo': str(result.idHoSo),
-            'ngayTao': result.ngayTao.strftime('%d.%m.%Y'),
+            'ngayTao': result.ngayTao.strftime('%d/%m/%Y'),
             'tinhTrang': result.tinhTrang,
             'id_benhnhan': str(result.id_benhnhan),
             'hoTen': result.hoTen,
-            'ngaySinh': result.ngaySinh.strftime('%d.%m.%Y'),
+            'ngaySinh': result.ngaySinh.strftime('%d/%m/%Y'),
             'diaChi': result.diaChi,
             'avatar': result.avatar,
             'gioiTinh': 'Nam' if result.gioiTinh else 'Nữ',
@@ -705,7 +677,7 @@ def get_TT_HoSoBenhNhan(idBenhNhan):
             'cccd': str(result.cccd)
         }
     else:
-        return None
+        return []
 
 
 def get_ListPhieuKham(idBenhNhan):
@@ -731,7 +703,7 @@ def get_ListPhieuKham(idBenhNhan):
     for row in listPK:
         listPhieuKham_result.append({
             'idPhieuKham': row.idPhieuKham,
-            'ngayTao': row.ngayTao.strftime('%d.%m.%Y'),
+            'ngayTao': row.ngayTao.strftime('%d/%m/%Y'),
             'trieuChung': row.trieuChung,
             'chanDoan': row.chanDoan,
             'id_bacsi': row.id_bacsi,
@@ -740,7 +712,7 @@ def get_ListPhieuKham(idBenhNhan):
             'gioiTinh': 'Nam' if row.gioiTinh else 'Nữ',
             'chuyenKhoa': row.chuyenKhoa,
             'avatar': row.avatar,
-            'ngaySinh': row.ngaySinh.strftime('%d.%m.%Y')
+            'ngaySinh': row.ngaySinh.strftime('%d/%m/%Y')
         })
     return listPhieuKham_result
 
@@ -807,10 +779,6 @@ def getListPhieuKham(idBenhNhan):
     return listLichKham
 
 
-def benhnhan_to_dict(bn):
-    bn1 = BenhNhan.query.filter_by(idBenhNhan=bn).first()
-    return bn1.__dict__
-
 
 def get_current_date_as_string():
     output_format = '%d/%m/%Y'
@@ -831,3 +799,17 @@ def add_HoSoBenhNhan(id_benhnhan):
         db.session.rollback()
         print(f"Lỗi trong add_HoSoBenhNhan: {e}")
         raise e
+
+
+def get_hoadon_by_benhnhan(id_benhnhan):
+    result = (
+        db.session.query(HoaDon)
+        .join(PhieuKham, HoaDon.idHoaDon == PhieuKham.id_hoadon)
+        .filter(PhieuKham.id_benhnhan == id_benhnhan)
+        .all()
+    )
+    return result
+
+
+def get_lichsu_hoadon():
+    return HoaDon.query.all()

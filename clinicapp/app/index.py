@@ -409,9 +409,9 @@ def lapphieukham():
 def lichkham():
     lichKhamToday = dao.get_LichKham_by_Yta()
 
-    # if (dao.check_reload_LichKham(lichKhamToday, session.get('lichKhamToday', []))):
-    #     return render_template('lapphieukham/lichkham.html', tinh_trang=dao.TINH_TRANG, date=dao.get_current_date_as_string())
-    del session['lichKhamToday']
+    if (dao.check_reload_LichKham(lichKhamToday, session.get('lichKhamToday', []))):
+        return render_template('lapphieukham/lichkham.html', tinh_trang=dao.TINH_TRANG, date=dao.get_current_date_as_string())
+
     session['lichKhamToday'] = lichKhamToday
     print(session['lichKhamToday'])
     return render_template('lapphieukham/lichkham.html', tinh_trang=dao.TINH_TRANG,date=dao.get_current_date_as_string())
@@ -655,6 +655,22 @@ def add_comment():
     except Exception as e:
         print(f"Error: {e}")  # Debug lỗi
         return {'error': str(e)}, 400
+
+
+
+@app.route('/danhsachhoadon', methods=['GET', 'POST'])
+def danh_sach_hoa_don():
+    if current_user.is_authenticated and current_user.idBenhNhan:
+        ds_hoadon = dao.get_hoadon_by_benhnhan(current_user.idBenhNhan)
+        return render_template("dshd_benhnhan.html", ds_hoadon=ds_hoadon)
+    return render_template("dshd_benhnhan.html", message="Bạn cần đăng nhập để xem thông tin hóa đơn.")
+
+
+
+@app.route('/lichsuhoadon', methods=['GET' , 'POST'])
+def lich_su_hoa_don():
+    ls_hoadon = dao.get_lichsu_hoadon()
+    return render_template("dshd_thungan.html", ls_hoadon=ls_hoadon)
 
 
 if __name__ == '__main__':
