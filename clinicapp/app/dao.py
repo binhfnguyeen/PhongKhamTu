@@ -319,6 +319,135 @@ def add_comment(content):
     db.session.commit()
     return c
 
+def load_phieu_kham():
+    results = db.session.query(
+        PhieuKham.idPhieuKham,
+        PhieuKham.ngayTao,
+        PhieuKham.trieuChung,
+        PhieuKham.chanDoan,
+        PhieuKham.id_benhnhan,
+        PhieuKham.id_bacsi
+    ).all()
+
+    phieu_kham_list = []
+    for result in results:
+        ngayTao = result.ngayTao.strftime('%d/%m/%Y') if result.ngayTao else None
+        phieu_kham_list.append({
+            'idPhieuKham': result.idPhieuKham,
+            'ngayTao': ngayTao,
+            'trieuChung': result.trieuChung,
+            'chanDoan': result.chanDoan,
+            'id_benhnhan': result.id_benhnhan,
+            'id_bacsi': result.id_bacsi
+        })
+
+    return phieu_kham_list
+
+
+def tim_phieukham_theo_id(id):
+    result = db.session.query(
+        PhieuKham.idPhieuKham,
+        PhieuKham.ngayTao.label('ngaytao'),
+        PhieuKham.trieuChung.label('trieu_chung'),
+        PhieuKham.chanDoan.label('chan_doan'),
+        BenhNhan.hoTen.label('ten_benhnhan'),
+        BacSi.hoTen.label('ten_bacsi')
+    ).join(BenhNhan, PhieuKham.id_benhnhan == BenhNhan.idBenhNhan) \
+    .join(BacSi, PhieuKham.id_bacsi == BacSi.idBacSi) \
+    .filter(PhieuKham.idPhieuKham == id).first()
+
+    if result:
+        ngaytao = result.ngaytao.strftime('%d/%m/%Y') if result.ngaytao else None
+        return {
+            'idPhieuKham': result.idPhieuKham,
+            'ngayTao': ngaytao,
+            'trieuChung': result.trieu_chung,
+            'chanDoan': result.chan_doan,
+            'ten_benhnhan': result.ten_benhnhan,
+            'ten_bacsi': result.ten_bacsi
+        }
+    return None
+
+
+def tim_phieukham_theo_ngaytao(ngayTao):
+    results = db.session.query(
+        PhieuKham.idPhieuKham,
+        PhieuKham.ngayTao.label('ngaytao'),
+        PhieuKham.trieuChung.label('trieu_chung'),
+        PhieuKham.chanDoan.label('chan_doan'),
+        BenhNhan.hoTen.label('ten_benhnhan'),
+        BacSi.hoTen.label('ten_bacsi')
+    ).join(BenhNhan, PhieuKham.id_benhnhan == BenhNhan.idBenhNhan) \
+        .join(BacSi, PhieuKham.id_bacsi == BacSi.idBacSi) \
+        .filter(PhieuKham.ngayTao == ngayTao).all()
+
+    if results:
+        phieu_kham_list = []
+        for result in results:
+            ngaytao = result.ngaytao.strftime('%d/%m/%Y') if result.ngaytao else None
+            phieu_kham_list.append({
+                'idPhieuKham': result.idPhieuKham,
+                'ngayTao': ngaytao,
+                'trieuChung': result.trieu_chung,
+                'chanDoan': result.chan_doan,
+                'ten_benhnhan': result.ten_benhnhan,
+                'ten_bacsi': result.ten_bacsi
+            })
+        return phieu_kham_list
+    return None
+
+
+def thuoc_theo_phieukham(id_phieukham):
+    try:
+        thuoc_query = db.session.query(
+            Thuoc.idThuoc,
+            Thuoc.tenThuoc,
+            Thuoc.loaiThuoc,
+            ChiTietDonThuoc.soLuongThuoc
+        ).join(ChiTietDonThuoc, Thuoc.idThuoc == ChiTietDonThuoc.id_thuoc) \
+         .join(PhieuKham, ChiTietDonThuoc.id_phieukham == PhieuKham.idPhieuKham) \
+         .filter(PhieuKham.idPhieuKham == id_phieukham).all()
+
+        if thuoc_query:
+            thuoc_list = []
+            for thuoc in thuoc_query:
+                thuoc_list.append({
+                    'idThuoc': thuoc.idThuoc,
+                    'tenThuoc': thuoc.tenThuoc,
+                    'loaiThuoc': thuoc.loaiThuoc.name,
+                    'soLuongThuoc': thuoc.soLuongThuoc
+                })
+            return thuoc_list
+        return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+def find_phieukham_by_id(id_phieukham):
+    return PhieuKham.query.filter_by(idPhieuKham=id_phieukham).first()
+
+
+def make_invoice(id_phieukham, tienkham, tienthuoc, id_thungan):
+    phieukham = find_phieukham_by_id(id_phieukham)
+
+    if not phieukham:
+        raise ValueError(f"PhieuKham with ID {id_phieukham} not found.")
+
+    hoa_don = HoaDon(
+        ngayKham=phieukham.ngayTao,
+        tienKham=tienkham,
+        tienThuoc=tienthuoc,
+        id_thungan=id_thungan
+    )
+
+    db.session.add(hoa_don)
+    db.session.commit()
+
+    phieukham.id_hoadon = hoa_don.idHoaDon
+    db.session.commit()
+
+    return hoa_don
 
 def load_comment():
     return Comment.query.all()

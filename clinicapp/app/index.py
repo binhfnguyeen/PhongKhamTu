@@ -533,7 +533,104 @@ def baocaothongke():
 
 @app.route('/thanhtoan')
 def thanhtoan():
-    return render_template('thanhtoan.html')
+    danh_sach_phieu_kham = dao.load_phieu_kham()
+    return render_template('thanhtoan.html', danh_sach_phieu_kham=danh_sach_phieu_kham)
+
+
+@app.route('/api/search_by_id', methods=['POST'])
+def search_by_id():
+    data = request.get_json()
+    id_phieukham = data.get('idPhieuKham')
+
+    if not id_phieukham:
+        return jsonify({"error": "Mã phiếu khám là bắt buộc"}), 400
+
+    phieu_kham = dao.tim_phieukham_theo_id(id_phieukham)
+
+    if phieu_kham:
+        return jsonify([phieu_kham]), 200
+    else:
+        return jsonify({"error": "Không tìm thấy phiếu khám với mã này"}), 404
+
+
+@app.route('/api/search_date_created', methods=["post"])
+def time_theo_ngay_tao():
+    data = request.get_json()
+    ngay_tao = data.get('ngayTao')
+
+    if not ngay_tao:
+        return jsonify({"error": "Ngày tạo là bắt buộc"}), 400
+
+    from datetime import datetime
+    try:
+        ngay_tao = datetime.strptime(ngay_tao, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({"error": "Định dạng ngày tạo không hợp lệ. Vui lòng sử dụng định dạng yyyy-mm-dd"}), 400
+
+    phieu_kham_list = dao.tim_phieukham_theo_ngaytao(ngay_tao)
+
+    if phieu_kham_list:
+        return jsonify(phieu_kham_list), 200
+    else:
+        return jsonify({"error": "Không tìm thấy phiếu khám nào với ngày tạo này"}), 404
+
+
+@app.route('/api/viewdetail/<id_phieukham>', methods=['GET'])
+def view_detail(id_phieukham):
+    try:
+        print(f"Received ID: {id_phieukham}")
+        phieukham = dao.tim_phieukham_theo_id(id_phieukham)
+        thuoc = dao.thuoc_theo_phieukham(id_phieukham)
+        if phieukham:
+            return jsonify({
+                'idPhieuKham': phieukham['idPhieuKham'],
+                'ngayTao': phieukham['ngayTao'],
+                'trieuChung': phieukham['trieuChung'],
+                'chanDoan': phieukham['chanDoan'],
+                'ten_benhnhan': phieukham['ten_benhnhan'],
+                'ten_bacsi': phieukham['ten_bacsi'],
+                'thuoc': thuoc
+            })
+        return jsonify({
+            'status': 'error',
+            'message': 'Không tìm thấy phiếu khám'
+        }), 404
+    except Exception as e:
+        print(f"Error: {e}")  # Log error message
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/make_invoice/<id_phieukham>', methods=["post"])
+def save_invoice(id_phieukham):
+    if current_user.is_authenticated and current_user.idThuNgan:
+        try:
+            data = request.get_json()
+            tienkham = data.get('tienkham')
+            tienthuoc = data.get('tienthuoc')
+
+            if not tienkham or not tienthuoc:
+                return jsonify({"error": "Vui lòng nhập đủ tiền khám và tiền thuốc."}), 400
+
+            hoa_don = dao.make_invoice(id_phieukham=id_phieukham, tienkham=tienkham, tienthuoc=tienthuoc,
+                                       id_thungan=current_user.idThuNgan)
+
+            return jsonify({
+                "message": "Hóa đơn đã được lập thành công.",
+                "hoa_don": {
+                    "idHoaDon": hoa_don.idHoaDon,
+                    "ngayKham": hoa_don.ngayKham,
+                    "tienKham": hoa_don.tienKham,
+                    "tienThuoc": hoa_don.tienThuoc,
+                    "id_thungan": hoa_don.id_thungan
+                }
+            }), 200
+        except Exception as e:
+            return jsonify({"error": f"Lỗi khi tạo hóa đơn: {str(e)}"}), 500
+    else:
+        return jsonify({"error": "Bạn phải đăng nhập và có quyền thu ngân để lập hóa đơn."}), 403
 
 
 @app.route('/api/comments', methods=['post'])
