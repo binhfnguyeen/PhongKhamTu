@@ -145,7 +145,8 @@ def get_ds_lichkham_relationship(user_id):
     return db.session.query(LichKham.idLichKham,
                             LichKham.ngayDangKy,
                             LichKham.ngayKham,
-                            YTa.hoTen.label('yta_name')).join(YTa, LichKham.id_yta == YTa.idYTa, isouter=True).filter(LichKham.id_benhnhan == user_id).all()
+                            YTa.hoTen.label('yta_name')).join(YTa, LichKham.id_yta == YTa.idYTa, isouter=True).filter(
+        LichKham.id_benhnhan == user_id).all()
 
 
 def get_danhsach_lichkham_benhnhan():
@@ -320,6 +321,137 @@ def add_comment(content):
     return c
 
 
+def load_phieu_kham():
+    results = db.session.query(
+        PhieuKham.idPhieuKham,
+        PhieuKham.ngayTao,
+        PhieuKham.trieuChung,
+        PhieuKham.chanDoan,
+        PhieuKham.id_benhnhan,
+        PhieuKham.id_bacsi
+    ).all()
+
+    phieu_kham_list = []
+    for result in results:
+        ngayTao = result.ngayTao.strftime('%d/%m/%Y') if result.ngayTao else None
+        phieu_kham_list.append({
+            'idPhieuKham': result.idPhieuKham,
+            'ngayTao': ngayTao,
+            'trieuChung': result.trieuChung,
+            'chanDoan': result.chanDoan,
+            'id_benhnhan': result.id_benhnhan,
+            'id_bacsi': result.id_bacsi
+        })
+
+    return phieu_kham_list
+
+
+def tim_phieukham_theo_id(id):
+    result = db.session.query(
+        PhieuKham.idPhieuKham,
+        PhieuKham.ngayTao.label('ngaytao'),
+        PhieuKham.trieuChung.label('trieu_chung'),
+        PhieuKham.chanDoan.label('chan_doan'),
+        BenhNhan.hoTen.label('ten_benhnhan'),
+        BacSi.hoTen.label('ten_bacsi')
+    ).join(BenhNhan, PhieuKham.id_benhnhan == BenhNhan.idBenhNhan) \
+        .join(BacSi, PhieuKham.id_bacsi == BacSi.idBacSi) \
+        .filter(PhieuKham.idPhieuKham == id).first()
+
+    if result:
+        ngaytao = result.ngaytao.strftime('%d/%m/%Y') if result.ngaytao else None
+        return {
+            'idPhieuKham': result.idPhieuKham,
+            'ngayTao': ngaytao,
+            'trieuChung': result.trieu_chung,
+            'chanDoan': result.chan_doan,
+            'ten_benhnhan': result.ten_benhnhan,
+            'ten_bacsi': result.ten_bacsi
+        }
+    return None
+
+
+def tim_phieukham_theo_ngaytao(ngayTao):
+    results = db.session.query(
+        PhieuKham.idPhieuKham,
+        PhieuKham.ngayTao.label('ngaytao'),
+        PhieuKham.trieuChung.label('trieu_chung'),
+        PhieuKham.chanDoan.label('chan_doan'),
+        BenhNhan.hoTen.label('ten_benhnhan'),
+        BacSi.hoTen.label('ten_bacsi')
+    ).join(BenhNhan, PhieuKham.id_benhnhan == BenhNhan.idBenhNhan) \
+        .join(BacSi, PhieuKham.id_bacsi == BacSi.idBacSi) \
+        .filter(PhieuKham.ngayTao == ngayTao).all()
+
+    if results:
+        phieu_kham_list = []
+        for result in results:
+            ngaytao = result.ngaytao.strftime('%d/%m/%Y') if result.ngaytao else None
+            phieu_kham_list.append({
+                'idPhieuKham': result.idPhieuKham,
+                'ngayTao': ngaytao,
+                'trieuChung': result.trieu_chung,
+                'chanDoan': result.chan_doan,
+                'ten_benhnhan': result.ten_benhnhan,
+                'ten_bacsi': result.ten_bacsi
+            })
+        return phieu_kham_list
+    return None
+
+
+def thuoc_theo_phieukham(id_phieukham):
+    try:
+        thuoc_query = db.session.query(
+            Thuoc.idThuoc,
+            Thuoc.tenThuoc,
+            Thuoc.loaiThuoc,
+            ChiTietDonThuoc.soLuongThuoc
+        ).join(ChiTietDonThuoc, Thuoc.idThuoc == ChiTietDonThuoc.id_thuoc) \
+            .join(PhieuKham, ChiTietDonThuoc.id_phieukham == PhieuKham.idPhieuKham) \
+            .filter(PhieuKham.idPhieuKham == id_phieukham).all()
+
+        if thuoc_query:
+            thuoc_list = []
+            for thuoc in thuoc_query:
+                thuoc_list.append({
+                    'idThuoc': thuoc.idThuoc,
+                    'tenThuoc': thuoc.tenThuoc,
+                    'loaiThuoc': thuoc.loaiThuoc.name,
+                    'soLuongThuoc': thuoc.soLuongThuoc
+                })
+            return thuoc_list
+        return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+def find_phieukham_by_id(id_phieukham):
+    return PhieuKham.query.filter_by(idPhieuKham=id_phieukham).first()
+
+
+def make_invoice(id_phieukham, tienkham, tienthuoc, id_thungan):
+    phieukham = find_phieukham_by_id(id_phieukham)
+
+    if not phieukham:
+        raise ValueError(f"PhieuKham with ID {id_phieukham} not found.")
+
+    hoa_don = HoaDon(
+        ngayKham=phieukham.ngayTao,
+        tienKham=tienkham,
+        tienThuoc=tienthuoc,
+        id_thungan=id_thungan
+    )
+
+    db.session.add(hoa_don)
+    db.session.commit()
+
+    phieukham.id_hoadon = hoa_don.idHoaDon
+    db.session.commit()
+
+    return hoa_don
+
+
 def load_comment():
     return Comment.query.all()
 
@@ -345,8 +477,20 @@ TINH_TRANG = {
 
 
 def get_id_benhnhan(id):
-    return BenhNhan.query.filter_by(idBenhNhan=id).first()
+    benhnhan = BenhNhan.query.filter_by(idBenhNhan=id).first()
+    kq = {
+        'idBenhNhan': benhnhan.idBenhNhan,
+        'hoTen': benhnhan.hoTen,
+        'gioiTinh': benhnhan.gioiTinh,
+        'ngaySinh': benhnhan.ngaySinh.strftime('%d/%m/%Y'),
+        'diaChi': benhnhan.diaChi,
+        'avatar': benhnhan.avatar
+    }
+    return kq
 
+if __name__ == '__main__':
+    with app.app_context():
+        print(get_id_benhnhan(1))
 
 def get_LichKham_Today():
     today = date.today()
@@ -381,46 +525,63 @@ def get_LichKham_Today():
         return []
 
 
-def get_patient_and_appointment():
-    # Lấy idLichKham từ session
-    id_lich_kham = session.get('idLichKham')
+def get_LichKham_by_Yta():
+    if 'lich_kham_ids' in session:
+        if session['lich_kham_ids']:
+            dsLickKham_id = session.get('lich_kham_ids')
+            dslickKham = []
+            print(dsLickKham_id)
+            # Duyệt qua các id trong session['lich_kham_ids'] và lấy thông tin chi tiết
+            for id in dsLickKham_id:
+                # Lấy thông tin phiếu khám và bệnh nhân
+                lichKham = db.session.query(
+                    LichKham.idLichKham,
+                    LichKham.id_benhnhan,
+                    LichKham.ngayKham,
+                    BenhNhan.hoTen,
+                    BenhNhan.ngaySinh,
+                    BenhNhan.diaChi,
+                    BenhNhan.gioiTinh,
+                    BenhNhan.avatar,
+                    BenhNhan.cccd
+                ).join(BenhNhan, BenhNhan.idBenhNhan == LichKham.id_benhnhan).filter(LichKham.idLichKham == id).first()
 
-    if not id_lich_kham:
-        return None  # Trả về None nếu không có ID trong session
+                if lichKham:
+                    dslickKham.append(lichKham)
 
-    # Truy vấn dữ liệu với join
-    result = db.session.query(
-        BenhNhan.hoTen,
-        BenhNhan.username,
-        BenhNhan.gioiTinh,
-        BenhNhan.ngaySinh,
-        BenhNhan.cccd,
-        BenhNhan.diaChi,
-        BenhNhan.sdt,
-        LichKham.ngayDangKy,
-        LichKham.ngayKham
-    ).join(
-        LichKham, BenhNhan.idBenhNhan == LichKham.id_benhnhan
-    ).filter(
-        LichKham.idLichKham == id_lich_kham
-    ).first()
+            kq = []
+            for i, row in enumerate(dslickKham, start=1):
+                if row:  # Kiểm tra nếu kết quả không phải None
+                    # Tạo dữ liệu trả về cho từng phiếu khám
+                    kq.append({
+                        'stt': i,
+                        'id_lich': row.idLichKham,
+                        'id_benhnhan': row.id_benhnhan,
+                        'hoVaTen': row.hoTen,
+                        'gioiTinh': row.gioiTinh,
+                        'namSinh': row.ngaySinh.strftime("%d/%m/%Y") if row.ngaySinh else None,
+                        'diaChi': row.diaChi,
+                        'ngayKham': row.ngayKham.strftime("%d/%m/%Y") if row.ngayKham else None,
+                        'avatar': row.avatar,
+                        'cccd': row.cccd,
+                        'tinhTrang': 0  # Có thể thay thế bằng enum hoặc trạng thái thực tế của phiếu khám
+                    })
 
-    # Kiểm tra kết quả
-    if result:
-        # Định dạng kết quả trả về dưới dạng từ điển
-        return {
-            'hoTen': result.hoTen,
-            'username': result.username,
-            'gioiTinh': 'Nam' if result.gioiTinh else 'Nữ',
-            'ngaySinh': str(result.ngaySinh),
-            'cccd': result.cccd,
-            'diaChi': result.diaChi,
-            'sdt': result.sdt,
-            'ngayDangKy': str(result.ngayDangKy),
-            'ngayKham': str(result.ngayKham)
-        }
-    else:
-        return None
+            # Sắp xếp theo trạng thái và thứ tự
+            kq.sort(key=lambda x: (x['tinhTrang'], x['stt']))
+            return kq
+
+    # Trả về danh sách rỗng nếu không có thông tin
+    return []
+
+
+# if __name__ == '__main__':
+#     with app.test_request_context():  # Thay app.app_context() bằng test_request_context()
+#         # Đặt giá trị cho session tại đây nếu cần
+#         session['lich_kham_ids'] = [1]  # Ví dụ về việc gán giá trị cho session
+#         print(get_LichKham_by_Yta())
+
+
 
 
 def check_reload_LichKham(listLK, listCheck):
@@ -442,7 +603,7 @@ def luuPhieuKham(idBenhNhan, idBacSi, listThuoc, ngayKham, trieuChung, chanDoan)
 
     phieuKham = PhieuKham(ngayTao=datetime.strptime(ngayKham, "%Y-%m-%d"),
                           id_benhnhan=int(idBenhNhan), trieuChung=trieuChung,
-                          chanDoan=chanDoan, id_bacsi=int(idBacSi), id_hoadon = None)
+                          chanDoan=chanDoan, id_bacsi=int(idBacSi), id_hoadon=None)
 
     db.session.add(phieuKham)
     db.session.commit()
@@ -504,11 +665,11 @@ def get_TT_HoSoBenhNhan(idBenhNhan):
     if result:
         return {
             'idHoSo': str(result.idHoSo),
-            'ngayTao': result.ngayTao.strftime('%d.%m.%Y'),
+            'ngayTao': result.ngayTao.strftime('%d/%m/%Y'),
             'tinhTrang': result.tinhTrang,
             'id_benhnhan': str(result.id_benhnhan),
             'hoTen': result.hoTen,
-            'ngaySinh': result.ngaySinh.strftime('%d.%m.%Y'),
+            'ngaySinh': result.ngaySinh.strftime('%d/%m/%Y'),
             'diaChi': result.diaChi,
             'avatar': result.avatar,
             'gioiTinh': 'Nam' if result.gioiTinh else 'Nữ',
@@ -516,7 +677,7 @@ def get_TT_HoSoBenhNhan(idBenhNhan):
             'cccd': str(result.cccd)
         }
     else:
-        return None
+        return []
 
 
 def get_ListPhieuKham(idBenhNhan):
@@ -542,7 +703,7 @@ def get_ListPhieuKham(idBenhNhan):
     for row in listPK:
         listPhieuKham_result.append({
             'idPhieuKham': row.idPhieuKham,
-            'ngayTao': row.ngayTao.strftime('%d.%m.%Y'),
+            'ngayTao': row.ngayTao.strftime('%d/%m/%Y'),
             'trieuChung': row.trieuChung,
             'chanDoan': row.chanDoan,
             'id_bacsi': row.id_bacsi,
@@ -551,7 +712,7 @@ def get_ListPhieuKham(idBenhNhan):
             'gioiTinh': 'Nam' if row.gioiTinh else 'Nữ',
             'chuyenKhoa': row.chuyenKhoa,
             'avatar': row.avatar,
-            'ngaySinh': row.ngaySinh.strftime('%d.%m.%Y')
+            'ngaySinh': row.ngaySinh.strftime('%d/%m/%Y')
         })
     return listPhieuKham_result
 
@@ -593,11 +754,6 @@ def get_ListThuoc(idPhieuKham):
     return listThuoc_result
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        print(get_LSKB(5))
-
-
 def get_thuoc():
     # Lấy tất cả các thuốc từ cơ sở dữ liệu
     thuocs = Thuoc.query.all()
@@ -618,21 +774,42 @@ def get_thuoc():
     return danh_sach_thuoc
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        print(get_thuoc())
-
-
 def getListPhieuKham(idBenhNhan):
     listLichKham = db.session.query(PhieuKham).filter(PhieuKham.id_benhnhan == idBenhNhan).all()
     return listLichKham
 
 
-def benhnhan_to_dict(bn):
-    bn1 = BenhNhan.query.filter_by(idBenhNhan=bn).first()
-    return bn1.__dict__
-
 
 def get_current_date_as_string():
     output_format = '%d/%m/%Y'
     return datetime.today().strftime(output_format)
+
+
+def add_HoSoBenhNhan(id_benhnhan):
+    try:
+        hoso = HoSoBenhNhan(
+            ngayTao=datetime.now(),
+            tinhTrang="Binh Thuong",
+            id_benhnhan=id_benhnhan
+        )
+        db.session.add(hoso)
+        db.session.commit()
+        return f"Đã tạo hồ sơ cho bệnh nhân ID {id_benhnhan}"
+    except Exception as e:
+        db.session.rollback()
+        print(f"Lỗi trong add_HoSoBenhNhan: {e}")
+        raise e
+
+
+def get_hoadon_by_benhnhan(id_benhnhan):
+    result = (
+        db.session.query(HoaDon)
+        .join(PhieuKham, HoaDon.idHoaDon == PhieuKham.id_hoadon)
+        .filter(PhieuKham.id_benhnhan == id_benhnhan)
+        .all()
+    )
+    return result
+
+
+def get_lichsu_hoadon():
+    return HoaDon.query.all()

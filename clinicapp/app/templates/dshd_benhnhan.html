@@ -1,0 +1,75 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Danh sách hóa đơn{% endblock %}
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div aria-live="polite" aria-atomic="true" class="position-relative">
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+                {% for category, message in messages %}
+                    <div class="toast align-items-center text-bg-{{ category if category != 'danger' else 'danger' }} border-0 mb-2"
+                         role="alert"
+                         aria-live="assertive"
+                         aria-atomic="true"
+                         data-bs-delay="3000"
+                         data-bs-autohide="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="container mt-5 mb-5">
+    <h1 class="text-center mb-4 text-primary">Danh Sách Hóa Đơn</h1>
+    {% if ds_hoadon %}
+        <div class="table-responsive shadow-lg rounded">
+            <table class="table table-hover text-center align-middle">
+                <thead class="table-primary text-dark fw-bold">
+                    <tr>
+                        <th>ID Hóa Đơn</th>
+                        <th>Ngày Khám</th>
+                        <th>Tiền Khám</th>
+                        <th>Tiền Thuốc</th>
+                        <th>ID Thu Ngân</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hoadon in ds_hoadon %}
+                        <tr>
+                            <td>{{ hoadon.idHoaDon }}</td>
+                            <td>{{ hoadon.ngayKham }}</td>
+                            <td>{{ "{:,.0f}".format(hoadon.tienKham) }} VND</td>
+                            <td>{{ "{:,.0f}".format(hoadon.tienThuoc) }} VND</td>
+                            <td>{{ hoadon.id_thungan }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center mt-4" role="alert">
+            Không có hóa đơn nào để hiển thị.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl).show();
+        });
+    });
+</script>
+{% endblock %}

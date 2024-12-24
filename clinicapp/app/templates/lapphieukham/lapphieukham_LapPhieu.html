@@ -264,24 +264,23 @@
                         <label for="trieuchungInput">Nhập triệu chứng...</label>
                     </div>
                 </div>
-                <form>
-                    <div class="mb-3">
-                        <label for="chandoanInput" class="form-label fw-bold">Chẩn đoán</label>
-                        <div class="form-floating">
+
+                <div class="mb-3">
+                    <label for="chandoanInput" class="form-label fw-bold">Chẩn đoán</label>
+                    <div class="form-floating">
                                 <textarea class="form-control" placeholder="Nhập triệu chứng" id="chandoanInput"
-                                          style="height: 4.8rem"></textarea>
-                            <label for="chandoanInput">Nhập chẩn đoán...</label>
-                        </div>
+                                          style="height: 4.8rem" disabled></textarea>
+                        <label for="chandoanInput">Nhập chẩn đoán...</label>
                     </div>
-                </form>
-<!--                <div class="mb-3">-->
-<!--                    <label for="loiKhuyenInput" class="form-label fw-bold">Lời Khuyên</label>-->
-<!--                    <div class="form-floating">-->
-<!--                                <textarea class="form-control" placeholder="Nhập triệu chứng" id="loiKhuyenInput"-->
-<!--                                          style="height: 4.8rem"></textarea>-->
-<!--                        <label for="chandoanInput">Lời khuyên của bác sĩ</label>-->
-<!--                    </div>-->
-<!--                </div>-->
+                </div>
+                <!--                <div class="mb-3">-->
+                <!--                    <label for="loiKhuyenInput" class="form-label fw-bold">Lời Khuyên</label>-->
+                <!--                    <div class="form-floating">-->
+                <!--                                <textarea class="form-control" placeholder="Nhập triệu chứng" id="loiKhuyenInput"-->
+                <!--                                          style="height: 4.8rem"></textarea>-->
+                <!--                        <label for="chandoanInput">Lời khuyên của bác sĩ</label>-->
+                <!--                    </div>-->
+                <!--                </div>-->
             </div>
         </div>
         <div class="container">
@@ -309,7 +308,7 @@
                 </table>
                 <!-- Add Button -->
                 <div class="text-center my-3">
-                    <button class="btn btn-primary" id="themThuoc" onclick="addMedicationRow()">
+                    <button class="btn btn-primary" id="themThuoc" onclick="addMedicationRow()" disabled>
                         <i class="fa fa-plus"></i> Thêm Thuốc
                     </button>
                 </div>
@@ -318,8 +317,8 @@
     </div>
 </div>
 <div class="d-grid gap-2 d-md-block" style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
-<!--    <button id="luuNhapPhieuKham" type="" class="btn btn-secondary">Lưu Nháp-->
-<!--    </button>-->
+    <!--    <button id="luuNhapPhieuKham" type="" class="btn btn-secondary">Lưu Nháp-->
+    <!--    </button>-->
     <button id="xuatPhieuKham" onclick="exportMedicalRecord()" class="btn btn-success">Xuất phiếu khám
     </button>
 </div>
@@ -498,6 +497,25 @@
         }
     }
 
+    $(document).ready(function () {
+        $('#trieuchungInput').on('input', function () {
+            if ($(this).val().trim() !== '') {
+                $('#chandoanInput').removeAttr('disabled'); // Enable chandoanInput if trieuchungInput is not empty
+            } else {
+                $('#chandoanInput').attr('disabled', 'disabled'); // Disable chandoanInput if trieuchungInput is empty
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#chandoanInput').on('input', function () {
+            if ($(this).val().trim() !== '') {
+                $('#themThuoc').removeAttr('disabled'); // Enable chandoanInput if trieuchungInput is not empty
+            } else {
+                $('#themThuoc').attr('disabled', 'disabled'); // Disable chandoanInput if trieuchungInput is empty
+            }
+        });
+    })
 
     // hàm ràng buộc thuốc + chẩn đoán
     $(document).ready(function () {

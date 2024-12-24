@@ -23,7 +23,12 @@
             {% elif current_user.is_authenticated and current_user.idThuNgan %}
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/thanhtoan">Thanh toán</a>
+                    <a class="nav-link" href="/thanhtoan">Lập hóa đơn</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/lichsuhoadon">Lịch sử hóa đơn</a>
                 </li>
             </ul>
             {% elif current_user.is_authenticated and current_user.idBenhNhan %}
@@ -34,7 +39,7 @@
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/thanhtoan">Thanh toán</a>
+                    <a class="nav-link" href="/danhsachhoadon">Danh sách hóa đơn</a>
                 </li>
             </ul>
             {% endif %}
