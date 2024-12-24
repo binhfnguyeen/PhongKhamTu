@@ -1,5 +1,5 @@
-from datetime import date
-
+from datetime import date, datetime, timedelta
+from random import choice, randint
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DATE, Enum
 # from sqlalchemy.orm import relationship
 from enum import Enum as DonViEnum
@@ -20,13 +20,29 @@ class NguoiDung(db.Model):
     avatar = Column(String(100),
                     default='https://res.cloudinary.com/dwivkhh8t/image/upload/v1732798321/male_fqyusr.png')
 
+    def to_dict(self):
+        # Chuyển đối tượng thành từ điển
+        return {
+            'hoTen': self.hoTen,
+            'username': self.username,
+            'gioiTinh': self.gioiTinh,
+            'ngaySinh': str(self.ngaySinh) if self.ngaySinh else None,
+            'cccd': self.cccd,
+            'diaChi': self.diaChi,
+            'sdt': self.sdt,
+            'avatar': self.avatar
+        }
 
 class BenhNhan(NguoiDung, UserMixin):
     idBenhNhan = Column(Integer, primary_key=True, autoincrement=True)
 
+
     def get_id(self):
         return (self.idBenhNhan)
-
+    def to_dict(self):
+        data = super().to_dict()  # Lấy dữ liệu từ lớp cha (NguoiDung)
+        data['idBenhNhan'] = self.idBenhNhan  # Thêm trường idBenhNhan
+        return data
 
 class NhanVien(NguoiDung, UserMixin):
     idNhanVien = Column(Integer, primary_key=True, autoincrement=True)
@@ -72,7 +88,7 @@ class HoSoBenhNhan(db.Model):
     ngayTao = Column(DATE)
     tinhTrang = Column(String(50))
     id_benhnhan = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
-
+    benhnhan = db.relationship('BenhNhan', backref='hosobenhnhan')
 
 class LichKham(db.Model):
     idLichKham = Column(Integer, primary_key=True, autoincrement=True)
@@ -80,6 +96,7 @@ class LichKham(db.Model):
     ngayKham = Column(DATE)
     id_benhnhan = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
     id_yta = Column(Integer, ForeignKey(YTa.idYTa), nullable=True)
+
     yta = db.relationship('YTa', backref='lichkhams', lazy=True)
     benhnhan = db.relationship('BenhNhan', backref='lichkhams')
 
@@ -87,6 +104,14 @@ class DonVi(DonViEnum):
     VIEN = 1
     CHAI = 2
     VY = 3
+
+    def readable(cls, value):
+        mapping = {
+            cls.VIEN: "Viên",
+            cls.CHAI: "Chai",
+            cls.VY: "Vỉ"
+        }
+        return mapping.get(value, "Không xác định")
 
 
 class Thuoc(db.Model):
@@ -109,15 +134,20 @@ class PhieuKham(db.Model):
     ngayTao = Column(DATE)
     trieuChung = Column(String(50))
     chanDoan = Column(String(50))
+    # loiKhuyen = Column(String(50))
     id_benhnhan = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
     id_bacsi = Column(Integer, ForeignKey(BacSi.idBacSi), nullable=False)
-    id_hoadon = Column(Integer, ForeignKey(HoaDon.idHoaDon), nullable=False)
+    id_hoadon = Column(Integer, ForeignKey(HoaDon.idHoaDon))
+
+    bacsi = db.relationship('BacSi', backref='phieukham')
 
 
 class ChiTietDonThuoc(db.Model):
     id_phieukham = Column(Integer, ForeignKey(PhieuKham.idPhieuKham), primary_key=True)
     id_thuoc = Column(Integer, ForeignKey(Thuoc.idThuoc), primary_key=True)
     soLuongThuoc = Column(Integer)
+    phieukham = db.relationship('PhieuKham', backref=db.backref('thuocs', lazy='dynamic'))
+    thuoc = db.relationship('Thuoc', backref=db.backref('phieukham', lazy='dynamic'))
 
 
 if __name__ == '__main__':
@@ -140,33 +170,33 @@ if __name__ == '__main__':
         # db.session.add(benh_nhan)
         # db.session.commit()
         #
-        # yta = YTa(
-        #     bangCap="Trung cấp Y tế",
-        #     ngayVaoLam="2020-03-01",
-        #     hoTen="Tran To B",
-        #     username="yta_tob",
-        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #     gioiTinh=False,
-        #     ngaySinh="1995-05-12",
-        #     cccd="095256781812",
-        #     diaChi="123 Đường ABC, Quận 1",
-        #     sdt="0987654441",
-        # )
-        #
-        # db.session.add(yta)
-        # db.session.commit()
+        yta = YTa(
+            bangCap="Trung cấp Y tế",
+            ngayVaoLam="2020-03-01",
+            hoTen="Nguyen Thi Be",
+            username="yta_be",
+            password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+            gioiTinh=False,
+            ngaySinh="1995-05-12",
+            cccd="123456789045",
+            diaChi="123 Đường ABC, Quận 1",
+            sdt="0987654344",
+        )
+
+        db.session.add(yta)
+        db.session.commit()
         #
         # bac_si = BacSi(
         #     ngayVaoLam="2015-06-01",
         #     bangCap="Bác sĩ chuyên khoa I",
-        #     hoTen="Nguyen Van A",
-        #     username="bacsi_a",
+        #     hoTen="Nguyen Van si",
+        #     username="bstri",
         #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
         #     gioiTinh=True,
         #     ngaySinh="1985-01-15",
-        #     cccd="123456788011",
+        #     cccd="123456788022",
         #     diaChi="456 Đường XYZ, Quận 2",
-        #     sdt="0912345678",
+        #     sdt="0912345600",
         #     chuyenKhoa="Nội tiết",
         # )
         #

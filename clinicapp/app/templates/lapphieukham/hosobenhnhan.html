@@ -1,0 +1,174 @@
+
+<h2 class="text-center " style="padding: 2rem">HỒ SƠ BỆNH NHÂN</h2>
+<!--thong tin benh nhan-->
+
+<div class="container">
+    <div class="row align-items-center justify-content-around thongtin" style="padding: 1rem;">
+        <h4>Thông tin</h4>
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-8">Họ và tên: <b>Trần Văn A</b></div>
+                <div class="col-6 col-md-4"><b>ID Bệnh nhân: 243434</b></div>
+            </div>
+            <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+            <div class="row">
+                <div class="col-6 col-md-4">Năm sinh: 01/01/1999</div>
+                <div class="col-6 col-md-4">Giới tính: Nữ</div>
+                <div class="col-6 col-md-4"></div>
+            </div>
+
+            <!-- Columns are always 50% wide, on mobile and desktop -->
+            <div class="row">
+                <div class="col-8">Địa chỉ: Ấp Bến Chò, Thạnh Đức, Gò Dầu, Tây Ninh</div>
+                <div class="col-2"></div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <img class="img-responsive"
+                 src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1733385867/phongkham1_pufuxt.png"
+                 alt="Chania" width="120" height="160">
+        </div>
+        <div class="col-md-2 align-self-end">
+            <button type="button" class="btn btn-info ">Đổi bệnh nhân</button>
+        </div>
+    </div>
+    <div class="container" style="padding: 1rem;">
+        <h4 class="text-center" style="padding: 1rem">LỊCH SỬ KHÁM BỆNH</h4>
+        <div style="padding: 1rem;">
+            <input class="form-control" id="searchHistory" type="text" placeholder="Search.." style="width: 50%">
+        </div>
+        <table class="table text-centre table-striped">
+            <thead>
+            <tr>
+                <th style="width: 10%">Ngày</th>
+                <th>Thông tin phiếu khám</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>01/01/1999</td>
+                <td>
+                    <div class="container">
+                        <div class="container">
+                            <div class="row align-items-center justify-content-around thongtin"
+                                 style="padding: 1rem;">
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-8">Bác sĩ: <b>Nguyễn Thị Q</b></div>
+                                        <div class="col-6 col-md-4"><b>ID Nhân Viên: 123456</b></div>
+                                    </div>
+
+                                    <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                                    <div class="row">
+                                        <div class="col-6 col-md-4">Năm sinh: 01/01/1999</div>
+                                        <div class="col-6 col-md-4">Giới tính: Nữ</div>
+                                        <div class="col-6 col-md-4">Chuyên Khoa: Thần kinh</div>
+                                    </div>
+
+                                    <!-- Columns are always 50% wide, on mobile and desktop -->
+                                    <div class="row">
+                                        <div class="col-6"></div>
+                                        <div class="col-6"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <img class="img-responsive"
+                                         src="https://res.cloudinary.com/dwivkhh8t/image/upload/v1733385867/phongkham1_pufuxt.png"
+                                         alt="Chania" width="120" height="160">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container">
+                            <div class=" flex-row-2 d-flex justify-content-around container">
+                                <div class="container">
+                                    <h4 class="text-center">Thông tin chẩn đoán</h4>
+                                    <div class="d-flex justify-content-around">
+                                        <div>
+                                            <div class="" style="width: 21rem">
+                                                <label for="inputTrieuChung" class="form-label fw-bold">Triệu
+                                                    chứng</label>
+                                                <textarea class="form-control" placeholder="Nhập triệu chứng"
+                                                          id="inputTrieuChung"
+                                                          style="max-height: 4.8rem"
+                                                          readonly>đau bụng đi ngoài</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="" style="width: 21rem">
+                                            <label for="idChanDoan" class="form-label fw-bold">Chẩn đoán</label>
+                                            <textarea class="form-control" placeholder="Nhập chẩn đoán"
+                                                      id="idChanDoan"
+                                                      style="max-height: 4.8rem" readonly>viêm đường ruột</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <h4 class="text-center">Toa thuốc</h4>
+                                <div class="container mt-4">
+                                    <!-- Prescription Table -->
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 5%;">STT</th>
+                                            <th style="width: 30%;">Tên Thuốc</th>
+                                            <th style="width: 13%;">Đơn Vị</th>
+                                            <th style="width: 13%;">Số Lượng</th>
+                                            <th style="width: 30%;">Cách Dùng</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <!-- Row 1 -->
+                                        <tr>
+                                            <td>1</td>
+                                            <td>
+                                                Paracetamol 500g
+                                            </td>
+                                            <td>
+                                                Vỉ
+                                            </td>
+                                            <td>
+                                                3
+                                            </td>
+                                            <td>
+                                                Ngày uống 2 lần sáng tối
+                                            </td>
+                                        </tr>
+                                        <!-- Row 2 -->
+                                        <tr>
+                                            <td>2</td>
+                                            <td>
+                                                BHA 5%
+                                            </td>
+                                            <td>
+                                                Chai
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                Bôi trước khi ngủ
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </td>
+            </tr>
+            <tr>
+                <td>01/01/1999</td>
+                <td>Moe</td>
+            </tr>
+            <tr>
+                <td>01/01/1999</td>
+                <td>Dooley</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>

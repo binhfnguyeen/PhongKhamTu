@@ -1,0 +1,50 @@
+{% extends 'lapphieukham.html' %}
+{% block content %}
+<div class="container p-5 my-5">
+    <h2>Tra cứu thuốc</h2>
+    <p>Nhập thông tin thuốc muốn tìm</p>
+    <input class="form-control" id="myInput" type="text" placeholder="Search..">
+    <br>
+    <table class="table table-bordered table-striped text-break">
+        <thead>
+        <tr>
+            <th style="width: 40%;">Tên Thuốc</th>
+            <th style="width: 10%;"><i>Đơn Vị</i></th>
+            <th style="width: 40%;">Cách dùng</th>
+        </tr>
+        </thead>
+        <tbody id="myTable">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% if dsthuoc %}
+        {% for thuoc in dsthuoc %}
+        <tr>
+            <td>{{ thuoc.tenThuoc }}</td>
+            <td><i>{{ 'Viên' if thuoc.loaiThuoc.value == 1 else 'Chai' if thuoc.loaiThuoc.value == 2 else 'Vỹ'}}</i>
+            </td>
+            <td>{{ thuoc.huongDanSuDung }}</td>
+        </tr>
+        {%endfor%}
+        {% endif%}
+        </tbody>
+    </table>
+    <p></p>
+</div>
+{% endblock %}
+

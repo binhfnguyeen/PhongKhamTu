@@ -11,14 +11,26 @@
                     <a class="nav-link" href="/dsk_benhnhan">Lịch khám</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/lapphieukham">Lập phiếu Khám</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="/thanhtoan">Thanh toán</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
                 </li>
+
+<!--                bác sĩ -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/lichkham">Lịch khám hôm nay</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tracuuthuoc">Tra cứu thuốc</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/lapphieukham_LapPhieu_id">Lập phiếu khám</a>
+                </li>
+
+                {% block lapphieukham_header %}
+                {% endblock %}
+
             </ul>
             {% endif %}
             <!-- Đăng nhập - Đăng ký -->

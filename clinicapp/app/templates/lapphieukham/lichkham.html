@@ -1,0 +1,59 @@
+{% extends "lapphieukham.html" %}
+
+{% block thongtinbacsi %}
+ {% include 'lapphieukham/thongtinbacsi.html'%}
+{% endblock %}
+
+{% block content %}
+
+<div class="container p-5 my-5">
+    <h2>Danh sách khám bệnh</h2>
+    <p>{{date}}</p>
+
+    {% if 'lichKhamToday' in session and session['lichKhamToday']  %}
+
+    <table class="table table-hover text-break">
+        <thead>
+        <tr>
+            <th style="width: 5%;">STT</th>
+            <th style="width: 20%;">Họ và Tên</th>
+            <th style="width: 8%;">Giới tính</th>
+            <th style="width: 8%;">Năm sinh</th>
+            <th style="width: 25%;">Địa chỉ</th>
+            <th style="width: 10%;">Ngày khám</th>
+            <th class="text-center" style="width: 10%;">Tình trạng</th>
+            <th class="text-center" style="width: 15%;"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for lichkham in session['lichKhamToday'] %}
+        <tr>
+            <td>{{ lichkham.stt }}</td>
+            <td>{{ lichkham.hoVaTen }}</td>
+            <td>{{ 'Nam' if lichkham.gioiTinh else 'Nữ' }}</td>
+            <td>
+                {{ lichkham.namSinh }}
+            </td>
+            <td>{{ lichkham.diaChi }}</td>
+            <td>{{ lichkham.ngayKham }}</td>
+            <td>
+                <i class="text{{ tinh_trang[lichkham.tinhTrang][2] }}">
+                                {{ tinh_trang[lichkham.tinhTrang][0] }} </i>
+            </td>
+            <td>
+                <form method="post" action="/lapphieukham">
+                    <input type="hidden" name="id_benhnhan" value="{{ lichkham.id_benhnhan }}">
+                    <input type="hidden" name="ngaykham" value="{{lichkham.ngayKham}}">
+                    <button type="submit" class="btn {{ tinh_trang[lichkham.tinhTrang][1] }}">Lập phiếu khám</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p><i>Không có lịch khám trong hôm nay</i></p>
+    {% endif %}
+</div>
+
+{% endblock %}
