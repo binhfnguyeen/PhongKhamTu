@@ -1,15 +1,10 @@
 from datetime import datetime, date
-from datetime import datetime
-
 from flask_login import current_user
 from sqlalchemy import func
 from sqlalchemy.engine import row
 from sqlalchemy.orm import joinedload, join, outerjoin
-
-from clinicapp.app.models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, Thuoc, HoSoBenhNhan, \
-    PhieuKham, ChiTietDonThuoc, HoaDon, DonVi
 from models import BenhNhan, NhanVien, YTa, BacSi, ThuNgan, QuanTri, LichKham, HoaDon, Thuoc, ChiTietDonThuoc, \
-    PhieuKham, Comment
+    PhieuKham, Comment, HoSoBenhNhan, DonVi
 from clinicapp.app import db, app
 import hashlib
 import cloudinary.uploader
@@ -445,9 +440,9 @@ def luuPhieuKham(idBenhNhan, idBacSi, listThuoc, ngayKham, trieuChung, chanDoan)
     print(f"Gọi luuPhieuKham với: idBenhNhan={idBenhNhan}, idBacSi={idBacSi},"
           f" ngayKham={ngayKham}, trieuChung={trieuChung}, chanDoan={chanDoan}, listThuoc={listThuoc}")
 
-    phieuKham = PhieuKham(ngayTao=datetime.strptime(ngayKham, '%Y-%m-%d'),
+    phieuKham = PhieuKham(ngayTao=datetime.strptime(ngayKham, "%Y-%m-%d"),
                           id_benhnhan=int(idBenhNhan), trieuChung=trieuChung,
-                          chanDoan=chanDoan, id_bacsi=int(idBacSi))
+                          chanDoan=chanDoan, id_bacsi=int(idBacSi), id_hoadon = None)
 
     db.session.add(phieuKham)
     db.session.commit()

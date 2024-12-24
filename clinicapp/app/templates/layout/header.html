@@ -5,32 +5,14 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            {% if current_user.is_authenticated and current_user.idBenhNhan %}
+            {% if current_user.is_authenticated and current_user.idBacSi %}
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/dsk_benhnhan">Lịch khám</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/thanhtoan">Thanh toán</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
-                </li>
-
-<!--                bác sĩ -->
-                <li class="nav-item">
+               <li class="nav-item">
                     <a class="nav-link" href="/lichkham">Lịch khám hôm nay</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/tracuuthuoc">Tra cứu thuốc</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/lapphieukham_LapPhieu_id">Lập phiếu khám</a>
-                </li>
-
-                {% block lapphieukham_header %}
-                {% endblock %}
-
             </ul>
             {% elif current_user.is_authenticated and current_user.idYTa %}
             <ul class="navbar-nav">
@@ -38,19 +20,18 @@
                     <a class="nav-link" href="/dsk_yta">Danh sách khám</a>
                 </li>
             </ul>
-            {% elif current_user.is_authenticated and current_user.idBacSi %}
+            {% elif current_user.is_authenticated and current_user.idThuNgan %}
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/lapphieukham">Lập phiếu Khám</a>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/thanhtoan">Thanh toán</a>
                 </li>
+            </ul>
+            {% elif current_user.is_authenticated and current_user.idBenhNhan %}
+            <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/baocaothongke">Báo cáo thống kê</a>
+                    <a class="nav-link" href="/dsk_benhnhan">Đặt lịch khám</a>
                 </li>
             </ul>
-            {% elif current_user.is_authenticated and current_user.idThuNgan %}
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="/thanhtoan">Thanh toán</a>

@@ -5,12 +5,11 @@ import dao
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 
-from clinicapp.app.models import BenhNhan
-
 
 @app.route('/')
 def index():
-    return render_template('home.html', list_comment=dao.load_comment())
+    comments=dao.load_comment()
+    return render_template('home.html', list_comment=comments)
 
 
 @app.route('/login', methods=['post', 'get'])
@@ -470,7 +469,7 @@ def luuPhieuKham():
         trieuChung = json_get('trieuChung')
         chanDoan = json_get('chanDoan')
         listThuoc = request.json.get('listThuoc', [])
-        idBacSi = '2'
+        idBacSi =  '4'
         for thuoc in listThuoc:
             # Lấy tên thuốc và loại bỏ tất cả khoảng trắng thừa
             tenThuocRaw = thuoc['tenThuoc']

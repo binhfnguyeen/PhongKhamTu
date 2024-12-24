@@ -31,6 +31,7 @@ class NguoiDung(db.Model):
 
 class BenhNhan(NguoiDung, UserMixin):
     __table_args__ = {"extend_existing": True}
+    __tablename__ = 'benhnhan'
     idBenhNhan = Column(Integer, primary_key=True, autoincrement=True)
 
     def get_id(self):
@@ -38,6 +39,7 @@ class BenhNhan(NguoiDung, UserMixin):
 
 
 class Comment(db.Model):
+    __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(String(255), nullable=False)
     user_id = Column(Integer, ForeignKey(BenhNhan.idBenhNhan), nullable=False)
@@ -91,6 +93,7 @@ class QuanTri(NhanVien):
 
 
 class HoSoBenhNhan(db.Model):
+    __table_args__ = {'extend_existing': True}
     idHoSo = Column(Integer, primary_key=True, autoincrement=True)
     ngayTao = Column(DATE)
     tinhTrang = Column(String(50))
@@ -98,6 +101,7 @@ class HoSoBenhNhan(db.Model):
     benhnhan = db.relationship('BenhNhan', backref='hosobenhnhan')
 
 class LichKham(db.Model):
+    __table_args__ = {'extend_existing': True}
     idLichKham = Column(Integer, primary_key=True, autoincrement=True)
     ngayDangKy = Column(DATE)
     ngayKham = Column(DATE)
@@ -123,6 +127,7 @@ class DonVi(DonViEnum):
 
 
 class Thuoc(db.Model):
+    __table_args__ = {'extend_existing': True}
     idThuoc = Column(Integer, primary_key=True, autoincrement=True)
     tenThuoc = Column(String(50))
     loaiThuoc = Column(Enum(DonVi), default=DonVi.VIEN)
@@ -130,6 +135,7 @@ class Thuoc(db.Model):
 
 
 class HoaDon(db.Model):
+    __table_args__ = {'extend_existing': True}
     idHoaDon = Column(Integer, primary_key=True, autoincrement=True)
     ngayKham = Column(DATE)
     tienKham = Column(Float)
@@ -138,6 +144,7 @@ class HoaDon(db.Model):
 
 
 class PhieuKham(db.Model):
+    __table_args__ = {'extend_existing': True}
     idPhieuKham = Column(Integer, primary_key=True, autoincrement=True)
     ngayTao = Column(DATE)
     trieuChung = Column(String(50))
@@ -151,6 +158,7 @@ class PhieuKham(db.Model):
 
 
 class ChiTietDonThuoc(db.Model):
+    __table_args__ = {'extend_existing': True}
     id_phieukham = Column(Integer, ForeignKey(PhieuKham.idPhieuKham), primary_key=True)
     id_thuoc = Column(Integer, ForeignKey(Thuoc.idThuoc), primary_key=True)
     soLuongThuoc = Column(Integer)
@@ -227,39 +235,39 @@ if __name__ == '__main__':
         # db.session.add(thu_ngan)
         # db.session.commit()
         #
-        # quan_tri = QuanTri(
-        #     ngayVaoLam="2019-11-01",
-        #     bangCap="Cử Nhân",
-        #     hoTen="Nguyen Duc A",
-        #     username="quantri_a",
-        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #     gioiTinh=True,
-        #     ngaySinh="1999-11-16",
-        #     cccd="100056778911",
-        #     diaChi="Nguyễn Văn Linh, Quận 7",
-        #     sdt="0992443668",
-        #     phongBan="PB_IT"
-        # )
-        #
-        # db.session.add(quan_tri)
-        # db.session.commit()
+        quan_tri = QuanTri(
+            ngayVaoLam="2019-11-01",
+            bangCap="Cử Nhân",
+            hoTen="Nguyen Duc A",
+            username="quantri_a",
+            password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+            gioiTinh=True,
+            ngaySinh="1999-11-16",
+            cccd="100056778911",
+            diaChi="Nguyễn Văn Linh, Quận 7",
+            sdt="0992443668",
+            phongBan="PB_IT"
+        )
 
-        # quan_tri = QuanTri(
-        #     ngayVaoLam="2019-11-01",
-        #     bangCap="Cử Nhân",
-        #     hoTen="Ngo Duc Ken",
-        #     username="quantri_kend",
-        #     password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #     gioiTinh=True,
-        #     ngaySinh="1999-11-16",
-        #     cccd="095250177891",
-        #     diaChi="Nguyễn Văn Linh, Quận 7",
-        #     sdt="0992444468",
-        #     phongBan="PB_IT"
-        # )
-        #
-        # db.session.add(quan_tri)
-        # db.session.commit()
+        db.session.add(quan_tri)
+        db.session.commit()
+
+        quan_tri = QuanTri(
+            ngayVaoLam="2019-11-01",
+            bangCap="Cử Nhân",
+            hoTen="Ngo Duc Ken",
+            username="quantri_kend",
+            password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+            gioiTinh=True,
+            ngaySinh="1999-11-16",
+            cccd="095250177891",
+            diaChi="Nguyễn Văn Linh, Quận 7",
+            sdt="0992444468",
+            phongBan="PB_IT"
+        )
+
+        db.session.add(quan_tri)
+        db.session.commit()
         #
         # thuoc1 = Thuoc(
         #     tenThuoc="Paracetamol",
