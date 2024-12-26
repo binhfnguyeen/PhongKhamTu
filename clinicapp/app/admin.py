@@ -37,15 +37,6 @@ class AdminView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.idQuanTri
 
-    def on_model_change(self, form, model, is_created):
-        if form.gioiTinh.data is False:
-            form.gioiTinh.data = False
-        if form.gioiTinh.data is True:
-            form.gioiTinh.data = True
-        if form.password.data:
-            model.password = hash_password(form.password.data)
-        return super().on_model_change(form, model, is_created)
-
 
 class ThuocView(AdminView):
     can_edit = True
@@ -135,6 +126,15 @@ class YTaView(AdminView):
         )
     }
 
+    def on_model_change(self, form, model, is_created):
+        if form.gioiTinh.data is False:
+            form.gioiTinh.data = False
+        if form.gioiTinh.data is True:
+            form.gioiTinh.data = True
+        if form.password.data:
+            model.password = hash_password(form.password.data)
+        return super().on_model_change(form, model, is_created)
+
 
 class BacSiView(AdminView):
     can_edit = True
@@ -180,6 +180,16 @@ class BacSiView(AdminView):
         )
     }
 
+    def on_model_change(self, form, model, is_created):
+        if form.gioiTinh.data is False:
+            form.gioiTinh.data = False
+        if form.gioiTinh.data is True:
+            form.gioiTinh.data = True
+        if form.password.data:
+            model.password = hash_password(form.password.data)
+        return super().on_model_change(form, model, is_created)
+
+
 
 class ThuNganView(AdminView):
     can_edit = True
@@ -217,6 +227,16 @@ class ThuNganView(AdminView):
         )
     }
 
+    def on_model_change(self, form, model, is_created):
+        if form.gioiTinh.data is False:
+            form.gioiTinh.data = False
+        if form.gioiTinh.data is True:
+            form.gioiTinh.data = True
+        if form.password.data:
+            model.password = hash_password(form.password.data)
+        return super().on_model_change(form, model, is_created)
+
+
 
 class QuanTriView(AdminView):
     can_edit = True
@@ -253,6 +273,16 @@ class QuanTriView(AdminView):
             widget=Select2Widget()
         )
     }
+
+    def on_model_change(self, form, model, is_created):
+        if form.gioiTinh.data is False:
+            form.gioiTinh.data = False
+        if form.gioiTinh.data is True:
+            form.gioiTinh.data = True
+        if form.password.data:
+            model.password = hash_password(form.password.data)
+        return super().on_model_change(form, model, is_created)
+
 
 
 class DoanhThuView(BaseView):

@@ -239,13 +239,13 @@ if __name__ == '__main__':
             ngayVaoLam="2019-11-01",
             bangCap="Cử Nhân",
             hoTen="Nguyen Duc A",
-            username="quantri_ab",
+            username="quantri_quanab",
             password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
             gioiTinh=True,
             ngaySinh="1999-11-16",
-            cccd="100054779911",
+            cccd="111054779911",
             diaChi="Nguyễn Văn Linh, Quận 7",
-            sdt="0992443168",
+            sdt="0992243168",
             phongBan="PB_IT"
         )
 
